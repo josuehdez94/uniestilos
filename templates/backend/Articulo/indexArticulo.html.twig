@@ -1,0 +1,69 @@
+{% extends 'backend/Default/homePage.html.twig' %}
+{% block title %}Articulos{% endblock %}
+{% set menu = 'Articulos' %}
+{% set list = 'Articulos' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-6 text-left">
+            <h4>Articulos</h4>
+        </div>
+        <div class="col-6 text-right">
+            <a class="btn btn-success" href="{{ url('backend_articulo_nuevo') }}">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
+    </div>
+    {% for label, messages in app.flashes(['Editado', 'Eliminado', 'Creado']) %}
+        {% for message in messages %}
+            <div class="col-md-8">
+                <div class="alert {{ label == 'Editado' or label == 'Creado' or 'Eliminado' ? 'alert-success' : 'alert-danger' }} alert-dismissible fade show" role="alert" id="flashMessage">
+                    <strong>{{label}}</strong>, {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+        <script>
+            $("#flashMessage").fadeTo(7000, 500).slideUp(500, function () {
+                $("#flashMessage").alert('close');
+            });
+        </script>
+    {% endfor %}
+    <div class="table-responsive-md">
+        <table class="table table-sm table-hover mt-3">
+            <thead class="text-center">
+                <tr>
+                    <th>Sku</th>
+                    <th>Descripcion</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+            {% for articulo in articulos %}
+                <tr style="font-size: 1.2em">
+                    <td>{{ articulo.sku }}</td>
+                    <td>{{ articulo.descripcion }}</td>
+                    <td>
+                        <a class="mx-2" href="{{ url('backend_categoria_detalles', {'id': articulo.id}) }}">
+                            <i class="far fa-eye text-info"></i>
+                        </a>
+                        <a class="mx-2" href="{{ path('backend_articulo_editar', {'id': articulo.id}) }}">
+                            <i class="far fa-edit text-primary"></i>
+                        </a>
+                        <a class="mx-2" href="#eliminarCategoria" data-toggle="modal" data-target="#eliminarCategoria-{{ articulo.id }}">
+                            <i class="far fa-trash-alt text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="10">No hay articulos</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock %}

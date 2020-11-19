@@ -1,0 +1,10 @@
+{% extends 'backend/Default/homePage.html.twig' %}
+{% block title %}Nuevo Usuario{% endblock %}
+{% set menu = 'Administracion usuarios' %}
+{% set list = 'Crear' %}
+{% block content %}
+    <h4>Crear usuario</h4>
+    <hr>
+    {{ include('backend/User/_form.html.twig') }}
+
+{% endblock %}

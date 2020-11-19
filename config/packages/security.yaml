@@ -1,0 +1,66 @@
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+        App\Entity\Cliente:
+            algorithm: auto
+
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    providers:
+        # used to reload user from session & other features (e.g. switch_user)
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                #property: name
+        front_user_provider:
+            entity:
+                class: App\Entity\Cliente
+                #property: name
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        secondary:
+            anonymous: lazy
+            guard:
+                authenticators:
+                    - App\Security\LoginFormAuthenticatorBack
+            pattern: ^/backend
+            provider: app_user_provider
+            logout:
+                path: app_logout
+                # where to redirect after logout
+                target: app_login
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+        main:
+            anonymous: lazy
+            guard:
+                authenticators:
+                    - App\Security\LoginFormAuthenticator
+            pattern: ^/
+            provider: app_user_provider
+            logout:
+                path: app_logout_client
+                # where to redirect after logout
+                target: app_login_client
+
+            # activate different ways to authenticate
+            # https://symfony.com/doc/current/security.html#firewalls-authentication
+
+            # https://symfony.com/doc/current/security/impersonating_user.html
+            # switch_user: true
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        - { path: ^/backend/users/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        #- { path: ^/*, roles: ROLE_USER }
+        #- { path: ^/backend/admin, roles: ROLE_ADMIN }
+        - { path: ^/backend, roles: ROLE_USER }
+        - { path: ^/cliente, roles: ROLE_USER }

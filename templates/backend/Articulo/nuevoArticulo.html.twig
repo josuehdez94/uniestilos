@@ -1,0 +1,17 @@
+{% extends 'backend/Articulo/indexArticulo.html.twig' %}
+{% block title %}Nuevo articulo{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url('backend_articulo_index') }}">Articulos</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Nuevo</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <h1>Nuevo Articulo</h1>
+    {{ include('backend/Articulo/_form.html.twig') }}
+{% endblock %}

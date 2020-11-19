@@ -1,0 +1,48 @@
+{% set tab = 'generales' %}
+{% form_theme form 'bootstrap_4_layout.html.twig' %}
+<div class="row">
+    <div class="col-md-10">
+        {{ form_start(form) }}
+        {{ form_errors(form) }}
+        <div class="form-row align-items-center">
+            <div class="col-6">
+                {{ form_label(form.sku) }}
+                {{ form_widget(form.sku) }}
+            </div>
+            <div class="col-6">
+                {{ form_label(form.categoria) }}
+                {{ form_widget(form.categoria) }}
+            </div>
+        </div>
+        <div class="form-row align-items-center mt-2">
+            <div class="col-12">
+                {{ form_label(form.descripcion) }}
+                {{ form_widget(form.descripcion) }}
+                {{ form_help(form.descripcion) }}
+            </div>
+        </div>
+        <div class="form-row align-items-center mt-2">
+            <div class="col-6">
+                {{ form_label(form.precio1) }}
+                {{ form_widget(form.precio1) }}
+            </div>
+            <div class="col-6">
+                {{ form_label(form.precio2) }}
+                {{ form_widget(form.precio2) }}
+            </div>
+        </div>
+        <div class="form-row align-items-center mt-2">
+            <div class="col-6">
+                {{ form_label(form.activo) }}
+                {{ form_widget(form.activo) }}
+                <br>
+                {{ form_help(form.activo) }}
+            </div>
+        </div>
+        <div class="text-right mt-3">
+            <a class="btn btn-sm btn-outline-primary" href="{{ url('backend_articulo_index') }}">Regresar</a>
+            <button class="btn btn-sm btn-success">{{ button_label|default('Guardar') }}</button>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>

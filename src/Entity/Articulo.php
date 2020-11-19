@@ -1,0 +1,389 @@
+<?php
+
+namespace App\Entity;
+
+use App\Repository\ArticuloRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+
+/**
+ * @ORM\Table(name="Articulo")
+ * @ORM\Entity(repositoryClass=ArticuloRepository::class)
+ * @UniqueEntity("sku", message="Este sku ya existe")
+ * @UniqueEntity("url_amigable")
+ * @ORM\HasLifecycleCallbacks()
+ */
+class Articulo
+{
+    /**
+     * @ORM\Id
+     * @ORM\GeneratedValue
+     * @ORM\Column(name="id",type="integer")
+     */
+    private $id;
+
+    /**
+     * @ORM\Column(name="sku", type="string", length=30, unique=true)
+     * @Assert\NotNull(groups={"backend_articulo_nuevo", "backend_articulo_editar"})
+     * @Assert\Unique
+     */
+    private $sku;
+
+    /**
+     * @ORM\Column(name="precio1", type="decimal", precision=10, scale=2, nullable=true)
+     * @Assert\Type(
+     *     type="integer",
+     *     message="EL valor {{ value }} no es valido {{ type }}."
+     * )
+     */
+    private $precio1;
+
+    /**
+     * @ORM\Column(name="precio2", type="decimal", precision=10, scale=2, nullable=true)
+     * @Assert\Type(
+     *     type="integer",
+     *     message="EL valor {{ value }} no es valido {{ type }}."
+     * )
+     */
+    private $precio2;
+
+    /**
+     * @ORM\Column(name="activo", type="boolean", nullable=true)
+     */
+    private $activo;
+
+    /**
+     * @ORM\Column(name="descripcion", type="string", length=255)
+     * @Assert\NotNull(groups={"backend_articulo_nuevo", "backend_articulo_editar"})
+     * @Assert\Length(
+     *      min = 10,
+     *      max = 255,
+     *      minMessage = "La descripcion debe contener minimo {{ limit }} caracteres",
+     *      maxMessage = "La descripcion debe contener maximo {{ limit }} caracteres",
+     *      allowEmptyString = false,
+     *      groups={"backend_articulo_nuevo", "backend_articulo_editar"}
+     * )
+     */
+    private $descripcion;
+
+    /**
+     * @ORM\Column(name="url_amigable", type="string", length=255, unique=true)
+     */
+    private $urlAmigable;
+
+    /**
+     * @var \User
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="usuario_creo_id", referencedColumnName="id")
+     * })
+     */
+    private $usuarioCreador;
+
+    /**
+     * @var \User
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\User")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="usuario_edito_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $usuarioEditor;
+
+    /**
+     * @var \ArticuloFotografia
+     *
+     * @ORM\ManyToOne(targetEntity="App\Entity\ArticuloFotografia")
+     * @ORM\JoinColumns({
+     *   @ORM\JoinColumn(name="fotografia_principal_id", referencedColumnName="id", nullable=true)
+     * })
+     */
+    private $fotografiaPrincipal;
+
+    /**
+     * @ORM\Column(name="fecha_hora_creacion", type="datetime")
+     */
+    private $fechahoraCreacion;
+
+    /**
+     * @ORM\Column(name="fecha_hora_edicion", type="datetime", nullable=true)
+     */
+    private $fechahoraEdicion;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Categoria::class, inversedBy="articulos")
+     * @ORM\JoinColumn(name="categoria_id", nullable=false)
+     */
+    private $categoria;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ArticuloFotografia", mappedBy="articulo")
+     */
+    private $fotografias;
+
+    /**
+     * @ORM\OneToMany(targetEntity=DocumentoRegistro::class, mappedBy="articulo")
+     */
+    private $documentoRegistros;
+
+    public function __construct()
+    {
+        $this->fechahoraCreacion = new \DateTime();
+        $this->documentoRegistros = new ArrayCollection();
+    }
+
+    public function __toString(){
+        return $this->descripcion;
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+    public function getSku(): ?string
+    {
+        return $this->sku;
+    }
+
+    public function setSku(string $sku): self
+    {
+        $this->sku = $sku;
+
+        return $this;
+    }
+
+    public function getPrecio1(): ?string
+    {
+        return $this->precio1;
+    }
+
+    public function setPrecio1(?string $precio1): self
+    {
+        $this->precio1 = $precio1;
+
+        return $this;
+    }
+
+    public function getPrecio2(): ?string
+    {
+        return $this->precio2;
+    }
+
+    public function setPrecio2(?string $precio2): self
+    {
+        $this->precio2 = $precio2;
+
+        return $this;
+    }
+
+    public function getActivo(): ?bool
+    {
+        return $this->activo;
+    }
+
+    public function setActivo(?bool $activo): self
+    {
+        $this->activo = $activo;
+
+        return $this;
+    }
+
+    public function getDescripcion(): ?string
+    {
+        return $this->descripcion;
+    }
+
+    public function setDescripcion(string $descripcion): self
+    {
+        $this->descripcion = $descripcion;
+
+        return $this;
+    }
+
+    public function getUrlAmigable(): ?string
+    {
+        return $this->urlAmigable;
+    }
+
+    public function setUrlAmigable(string $urlAmigable): self
+    {
+        $this->urlAmigable = $urlAmigable;
+
+        return $this;
+    }
+
+    public function getCategoria(): ?Categoria
+    {
+        return $this->categoria;
+    }
+
+    public function setCategoria(?Categoria $categoria): self
+    {
+        $this->categoria = $categoria;
+
+        return $this;
+    }
+
+    /**
+     * @return \User
+     */
+    public function getUsuarioCreador()
+    {
+        return $this->usuarioCreador;
+    }
+
+    /**
+     * @param \User $usuarioCreador
+     */
+    public function setUsuarioCreador($usuarioCreador): void
+    {
+        $this->usuarioCreador = $usuarioCreador;
+    }
+
+    /**
+     * @return \User
+     */
+    public function getUsuarioEditor()
+    {
+        return $this->usuarioEditor;
+    }
+
+    /**
+     * @param \User $usuarioEditor
+     */
+    public function setUsuarioEditor($usuarioEditor): void
+    {
+        $this->usuarioEditor = $usuarioEditor;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFechahoraCreacion()
+    {
+        return $this->fechahoraCreacion;
+    }
+
+    /**
+     * @param mixed $fechahoraCreacion
+     */
+    public function setFechahoraCreacion($fechahoraCreacion): void
+    {
+        $this->fechahoraCreacion = $fechahoraCreacion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFechahoraEdicion()
+    {
+        return $this->fechahoraEdicion;
+    }
+
+    /**
+     * @param mixed $fechahoraEdicion
+     */
+    public function setFechahoraEdicion($fechahoraEdicion): void
+    {
+        $this->fechahoraEdicion = $fechahoraEdicion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFotografias()
+    {
+        return $this->fotografias;
+    }
+
+    /**
+     * Get the value of fotografiaPrincipal
+     *
+     * @return  \ArticuloFotografia
+     */ 
+    public function getFotografiaPrincipal()
+    {
+        return $this->fotografiaPrincipal;
+    }
+
+    /**
+     * Set the value of fotografiaPrincipal
+     *
+     * @param  \ArticuloFotografia  $fotografiaPrincipal
+     *
+     * @return  self
+     */ 
+    public function setFotografiaPrincipal($fotografiaPrincipal)
+    {
+        $this->fotografiaPrincipal = $fotografiaPrincipal;
+
+        return $this;
+    }
+
+    /**
+     * @param mixed $fotografias
+     */
+    public function setFotografias($fotografias): void
+    {
+        $this->fotografias = $fotografias;
+    }
+
+    /**
+     * @ORM\PreUpdate()
+     */
+    public function atUpdate() {
+
+        if(is_null($this->fechahoraCreacion)){
+            $this->fechahoraCreacion = new \DateTime();
+        }
+
+        $this->setFechahoraEdicion(new \DateTime());
+    }
+
+    /**
+     * funcion para agregar la urlAmigable a los articulos
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     */
+    public function addUrlAmigable()
+    {
+        $url = new \App\Generales\Funciones();
+        $this->urlAmigable = $url->urlAmigable($this->id . "-" .$this->descripcion. "-". $this->sku);
+        return $this;
+    }
+
+    /**
+     * @return Collection|DocumentoRegistro[]
+     */
+    public function getDocumentoRegistros(): Collection
+    {
+        return $this->documentoRegistros;
+    }
+
+    public function addDocumentoRegistro(DocumentoRegistro $documentoRegistro): self
+    {
+        if (!$this->documentoRegistros->contains($documentoRegistro)) {
+            $this->documentoRegistros[] = $documentoRegistro;
+            $documentoRegistro->setArticulo($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDocumentoRegistro(DocumentoRegistro $documentoRegistro): self
+    {
+        if ($this->documentoRegistros->removeElement($documentoRegistro)) {
+            // set the owning side to null (unless already changed)
+            if ($documentoRegistro->getArticulo() === $this) {
+                $documentoRegistro->setArticulo(null);
+            }
+        }
+
+        return $this;
+    }
+}

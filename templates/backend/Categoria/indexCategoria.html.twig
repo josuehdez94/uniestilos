@@ -1,0 +1,88 @@
+{% extends 'backend/Default/homePage.html.twig' %}
+{% block title %}Categorias{% endblock %}
+{% set menu = 'Articulos' %}
+{% set list = 'Categorias' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-6 text-left">
+            <h4>Categorias</h4>
+        </div>
+        <div class="col-6 text-right">
+            <a class="btn btn-success" href="{{ url('backend_categoria_nueva') }}">
+                <i class="fas fa-plus"></i>
+            </a>
+        </div>
+    </div>
+    {% for label, messages in app.flashes(['Editado', 'Eliminado', 'Creado']) %}
+        {% for message in messages %}
+            <div class="col-md-8">
+                <div class="alert {{ label == 'Editado' or label == 'Creado' or 'Eliminado' ? 'alert-success' : 'alert-danger' }} alert-dismissible fade show" role="alert" id="flashMessage">
+                    <strong>{{label}}</strong>, {{ message }}
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+        <script>
+            $("#flashMessage").fadeTo(7000, 500).slideUp(500, function () {
+                $("#flashMessage").alert('close');
+            });
+        </script>
+    {% endfor %}
+    <div class="table-responsive-md">
+        <table class="table table-sm table-hover mt-3">
+            <thead class="text-center">
+                <tr>
+                    <th>Nombre</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+            {% for categoria in categorias %}
+                <tr>
+                    <td>{{ categoria.nombre }}</td>
+                    <td style="font-size: 1.2em">
+                        <a class="mx-2" href="{{ url('backend_categoria_detalles', {'id': categoria.id}) }}">
+                            <i class="far fa-eye text-info"></i>
+                        </a>
+                        <a class="mx-2" href="{{ url('backend_categoria_editar', {'id': categoria.id}) }}">
+                            <i class="far fa-edit text-primary"></i>
+                        </a>
+                        <a class="mx-2" href="#eliminarCategoria" data-toggle="modal" data-target="#eliminarCategoria-{{ categoria.id }}">
+                            <i class="far fa-trash-alt text-danger"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% block modalEliminar %}
+                <!-- Modal -->
+                <div class="modal fade" id="eliminarCategoria-{{ categoria.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLabel">Eliminar categoria <b>{{ categoria.nombre }}</b></h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                ¿Seguro(a) de eliminar esta categoria ?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-sm btn-secondary" data-dismiss="modal">Cerrar</button>
+                                {{ include('backend/Categoria/_delete_form.html.twig') }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endblock %}
+            {% else %}
+                <tr>
+                    <td colspan="3">No hay categorias</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

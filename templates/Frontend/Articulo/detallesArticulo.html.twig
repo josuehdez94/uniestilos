@@ -1,0 +1,197 @@
+{% extends 'home_page/homePage2.html.twig' %}
+
+{% block title %}detalles articulo {{articulo.sku}} {% endblock %}
+{% block content %}
+    <script src="{{ asset('js/jquery.zoom.js') }}"></script>
+    <div id="all">
+        <div id="content">
+            <div class="container">
+                <div class="row">
+                   <div class="col-lg-3 order-2 order-lg-1">
+                        <!--
+                        *** MENUS AND FILTERS ***
+                        _________________________________________________________
+                        -->
+                         {#<div class="card sidebar-menu mb-4">
+                            <div class="card-header">
+                                <h3 class="h4 card-title">Categories</h3>
+                            </div>
+                            <div class="card-body">
+                                <ul class="nav nav-pills flex-column category-menu">
+                                    <li><a href="category.html" class="nav-link">Men <span class="badge badge-secondary">42</span></a>
+                                        <ul class="list-unstyled">
+                                            <li><a href="category.html" class="nav-link">T-shirts</a></li>
+                                            <li><a href="category.html" class="nav-link">Shirts</a></li>
+                                            <li><a href="category.html" class="nav-link">Pants</a></li>
+                                            <li><a href="category.html" class="nav-link">Accessories</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="category.html" class="nav-link active">Ladies  <span class="badge badge-light">123</span></a>
+                                        <ul class="list-unstyled">
+                                            <li><a href="category.html" class="nav-link">T-shirts</a></li>
+                                            <li><a href="category.html" class="nav-link">Skirts</a></li>
+                                            <li><a href="category.html" class="nav-link">Pants</a></li>
+                                            <li><a href="category.html" class="nav-link">Accessories</a></li>
+                                        </ul>
+                                    </li>
+                                    <li><a href="category.html" class="nav-link">Kids  <span class="badge badge-secondary">11</span></a>
+                                        <ul class="list-unstyled">
+                                            <li><a href="category.html" class="nav-link">T-shirts</a></li>
+                                            <li><a href="category.html" class="nav-link">Skirts</a></li>
+                                            <li><a href="category.html" class="nav-link">Pants</a></li>
+                                            <li><a href="category.html" class="nav-link">Accessories</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>#}
+                        <!-- *** MENUS AND FILTERS END ***-->
+                    </div>
+                    <div class="col-lg-9 order-1 order-lg-2">
+                        <div class="col-lg-12">
+                            <!-- breadcrumb-->
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb">
+                                    <li class="breadcrumb-item"><a href="{{ url('frontend_home_page') }}">Inicio</a></li>
+                                    <li class="breadcrumb-item"><a href="#">Categoria</a></li>
+                                    <li aria-current="page" class="breadcrumb-item active">{{ articulo.descripcion }}</li>
+                                </ol>
+                            </nav>
+                        </div>
+                        {#<div id="productMain" class="row">
+                            <div class="col-md-6">
+                                <div data-slider-id="1" class="owl-carousel shop-detail-carousel">
+                                    <div class="item"> <img src="img/detailbig1.jpg" alt="" class="img-fluid"></div>
+                                    <div class="item"> <img src="img/detailbig2.jpg" alt="" class="img-fluid"></div>
+                                    <div class="item"> <img src="img/detailbig3.jpg" alt="" class="img-fluid"></div>
+                                </div>
+                                <div class="ribbon sale">
+                                    <div class="theribbon">SALE</div>
+                                    <div class="ribbon-background"></div>
+                                </div>
+                                <!-- /.ribbon-->
+                                <div class="ribbon new">
+                                    <div class="theribbon">NEW</div>
+                                    <div class="ribbon-background"></div>
+                                </div>
+                                <!-- /.ribbon-->
+                            </div>
+                            <div class="col-md-6">
+                                <div class="box">
+                                    <h1 class="text-center">White Blouse Armani</h1>
+                                    <p class="goToDescription"><a href="#details" class="scroll-to">Scroll to product details, material &amp; care and sizing</a></p>
+                                    <p class="price">$124.00</p>
+                                    <p class="text-center buttons"><a href="basket.html" class="btn btn-primary"><i class="fa fa-shopping-cart"></i> Add to cart</a><a href="basket.html" class="btn btn-outline-primary"><i class="fa fa-heart"></i> Add to wishlist</a></p>
+                                </div>
+                                <div data-slider-id="1" class="owl-thumbs">
+                                    <button class="owl-thumb-item"><img src="img/detailsquare.jpg" alt="" class="img-fluid"></button>
+                                    <button class="owl-thumb-item"><img src="img/detailsquare2.jpg" alt="" class="img-fluid"></button>
+                                    <button class="owl-thumb-item"><img src="img/detailsquare3.jpg" alt="" class="img-fluid"></button>
+                                </div>
+                            </div>
+                        </div>#}
+                        <div id="productMain" class="row">
+                            <div class="col-md-6" data-aos="flip-down">
+                                {#<div class="col-lg-8 col-xs-12 col-centered" data-aos="zoom-out-right">#}
+                                    <div class="card" style="max-width:680px;max-height:350px">
+                                        <style>
+                                            /* magnifying glass icon */
+                                            .zoom:after {
+                                            content:'';display:block; width:33px; height:33px; position:absolute; top:0;right:0;background:url("{{asset('assets/img/front/icon.png')}}");
+                                            }
+                                            #imagenPrincipal img:hover { cursor: url("{{asset('assets/img/front/grab.cur')}}"), default; }
+                                            #imagenPrincipal img:active { cursor:url("{{asset('assets/img/front/grabbed.cur')}}"), default; }
+                                        </style>
+                                        <span class='zoom' id='imagenPrincipal'>
+                                            <img src="{{ articulo.fotografiaPrincipal ? articulo.fotografiaPrincipal.getWebNombreArchivo : articulo.getNoLogoImage }}" class="card-img-top" alt="..." id="imagenPrincipal-{{ articulo.id }}" style="max-width:680px;max-height:350px">
+                                        </span>
+                                        <script>
+                                            $(document).ready(function(){        
+                                                var imagenPrincipal = $('#imagenPrincipal-{{ articulo.id }}').attr('src');
+                                                $('#imagenPrincipal').zoom({url: imagenPrincipal});
+                                            });
+                                        </script>
+                                    </div>
+                                    <div class="card border-light mb-3">
+                                        <div class="card-body">
+                                            <div class="row">
+                                                {% for foto in articulo.fotografias %}
+                                                <div class="col-2">
+                                                    <img src="{{ foto.getWebMiniThumbnailNombreArchivo }}" class="card-img-top" alt="..." id="imagenChange-{{foto.id}}">
+                                                        <script>
+                                                        $( "#imagenChange-{{foto.id}}" ).click(function() {
+                                                            var url = "{{ foto.getWebNombreArchivo }}";
+                                                            $('#imagenPrincipal-{{ articulo.id }}').attr('src', url);
+                                                            $('img[class="zoomImg"]').attr('src', url);
+                                                        });
+                                                    </script>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {#</div>#}
+                            </div>
+                            <div class="col-md-6">
+                                <div class="box" data-aos="zoom-out-right">
+                                    <h4 class="text-center">{{ articulo.descripcion }}</h4>
+                                    <p class="goToDescription text-secondary"><span>Sku: </span>{{ articulo.sku }}</p>
+                                    <p class="price">{{ articulo.precio1 is not null ? '$' ~ articulo.precio1 : 'Este articulo aun no cuenta con precio'}}</p>
+                                    <p class="text-center buttons">
+                                        <a href="basket.html" class="btn btn-primary mt-1"><i class="fa fa-shopping-cart"></i> Añadir al carrito</a>
+                                        {#<a href="basket.html" class="btn btn-outline-primary"><i class="fa fa-heart"></i> Add to wishlist</a>#}
+                                        <script
+                                            src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
+                                            data-preference-id="{{ preference.id }}">
+                                        </script>
+                                        <script>
+                                            $( document ).ready(function() {
+                                                $('.mercadopago-button').html('Comprar Ahora');
+                                                $('.mercadopago-button').addClass('btn btn-sm btn-');
+                                            });
+                                        </script>
+                                    </p>
+                                    
+                                </div>
+                                <div data-slider-id="1" class="owl-thumbs">
+                                    <button class="owl-thumb-item"><img src="img/detailsquare.jpg" alt="" class="img-fluid"></button>
+                                    <button class="owl-thumb-item"><img src="img/detailsquare2.jpg" alt="" class="img-fluid"></button>
+                                    <button class="owl-thumb-item"><img src="img/detailsquare3.jpg" alt="" class="img-fluid"></button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="details" class="box">
+                            <p></p>
+                            <h4>Product details</h4>
+                            <p>White lace top, woven, has a round neck, short sleeves, has knitted lining attached</p>
+                            <h4>Material &amp; care</h4>
+                            <ul>
+                                <li>Polyester</li>
+                                <li>Machine wash</li>
+                            </ul>
+                            <h4>Size &amp; Fit</h4>
+                            <ul>
+                                <li>Regular fit</li>
+                                <li>The model (height 5'8" and chest 33") is wearing a size S</li>
+                            </ul>
+                            <blockquote>
+                                <p><em>Define style this season with Armani's new range of trendy tops, crafted with intricate details. Create a chic statement look by teaming this lace number with skinny jeans and pumps.</em></p>
+                            </blockquote>
+                            <hr>
+                            <div class="social">
+                                <h4>Show it to your friends</h4>
+                                <p><a href="#" class="external facebook"><i class="fa fa-facebook"></i></a><a href="#" class="external gplus"><i class="fa fa-google-plus"></i></a><a href="#" class="external twitter"><i class="fa fa-twitter"></i></a><a href="#" class="email"><i class="fa fa-envelope"></i></a></p>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <!-- /.col-md-9-->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{{ asset('js/animate.js') }}"></script>
+    <script>
+         AOS.init();
+    </script>
+{% endblock %}

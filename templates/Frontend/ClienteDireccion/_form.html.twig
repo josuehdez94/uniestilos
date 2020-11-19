@@ -1,0 +1,116 @@
+<div id="all">
+    <div id="content">
+        <div class="container">
+           
+                <!-- breadcrumb-->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url('frontend_home_page') }}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('front_user_micuenta') }}">Mi cuenta</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('front_cliente_direccion_index') }}">Direcciones</a></li>
+                        <li aria-current="page" class="breadcrumb-item active">Nueva dirección</li>
+                    </ol>
+                </nav>
+       
+            <h3>Nueva dirección</h3>
+            {% form_theme form 'bootstrap_4_layout.html.twig' %}
+            {{ form_start(form) }}
+            {{ form_errors(form) }}
+                <div class="form-row">
+                    <div class="col-12">
+                        {{ form_label(form.nombreCompleto) }}
+                        {{ form_widget(form.nombreCompleto) }}
+                        {{ form_help(form.nombreCompleto) }}
+                    </div>
+                </div>
+                <div class="form-row mt-2">
+                    <div class="col-6">
+                        {{ form_label(form.estado) }}
+                        {{ form_widget(form.estado) }}
+                        {{ form_help(form.estado) }}
+                    </div>
+                    <div class="col-6">
+                        {{ form_label(form.municipio) }}
+                        {{ form_widget(form.municipio) }}
+                    </div>
+                </div>
+                <div class="form-row mt-2">
+                    <div class="col-4">
+                        {{ form_label(form.calle) }}
+                        {{ form_widget(form.calle) }}
+                        {{ form_help(form.calle) }}
+                    </div>
+                    <div class="col-4">
+                        {{ form_label(form.numeroExterior) }}
+                        {{ form_widget(form.numeroExterior) }}
+                    </div>
+                    <div class="col-4">
+                        {{ form_label(form.numeroInterior) }}
+                        {{ form_widget(form.numeroInterior) }}
+                    </div>
+                </div>
+                <div class="form-row mt-2">
+                    <div class="col-4">
+                        {{ form_label(form.colonia) }}
+                        {{ form_widget(form.colonia) }}
+                    </div>
+                    <div class="col-4">
+                        {{ form_label(form.codigoPostal) }}
+                        {{ form_widget(form.codigoPostal) }}
+                    </div>
+                    <div class="col-4">
+                        {{ form_label(form.telefono) }}
+                        {{ form_widget(form.telefono) }}
+                    </div>
+                </div>
+                <div class="form-row mt-2">
+                    <div class="col-12">
+                        {{ form_label(form.Referencias) }}
+                        {{ form_widget(form.Referencias) }}
+                        {{ form_help(form.Referencias) }}
+                    </div>
+                </div>
+                <div class="form-row mt-2">
+                    <div class="col-12">
+                        {{ form_label(form.instrucionesEntrega) }}
+                        {{ form_widget(form.instrucionesEntrega) }}
+                        {{ form_help(form.instrucionesEntrega) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 text-right mt-2">
+                        <button class="btn btn-sm btn-primary">{{ button_label|default('Guardar') }}</button>
+                    </div>
+                </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+<script>
+    var $estado = $('#cliente_direccion_estado');
+    // When sport gets selected ...
+    $estado.change(function() {
+      // ... retrieve the corresponding form.
+      var $form = $(this).closest('form');
+      // Simulate form data, but only include the selected sport value.
+      var data = {};
+      data[$estado.attr('name')] = $estado.val();
+      // Submit data via AJAX to the form's action path.
+      $.ajax({
+        url : $form.attr('action'),
+        type: $form.attr('method'),
+        data : data,
+        beforeSend: function(e){
+            $('#cliente_direccion_municipio').html("<option disabled selected> cargando ... </option>");
+        },
+        success: function(html) {
+          // Replace current position field ...
+          $('#cliente_direccion_municipio').replaceWith(
+            // ... with the returned one from the AJAX response.
+            $(html).find('#cliente_direccion_municipio')
+          );
+          // Position field now displays the appropriate positions.
+        }
+      });
+    });
+</script>

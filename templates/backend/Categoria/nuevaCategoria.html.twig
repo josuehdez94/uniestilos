@@ -1,0 +1,17 @@
+{% extends 'backend/Categoria/indexCategoria.html.twig' %}
+{% block title %}Nueva categoria{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url('backend_categoria_index') }}">Categorias</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Nueva</li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+    <h1>Nueva categoria</h1>
+    {{ include('backend/Categoria/_form.html.twig') }}
+{% endblock %}
