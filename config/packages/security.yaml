@@ -60,6 +60,8 @@ security:
     access_control:
         - { path: ^/backend/users/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/login$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/cliente/registro$, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/cliente/validacion-correo, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         #- { path: ^/*, roles: ROLE_USER }
         #- { path: ^/backend/admin, roles: ROLE_ADMIN }
         - { path: ^/backend, roles: ROLE_USER }

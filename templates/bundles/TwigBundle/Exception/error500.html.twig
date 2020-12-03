@@ -1,0 +1,16 @@
+{% extends 'Frontend/Default/base.html.twig' %}
+{% block body %}
+    <div class="row alert alert-danger">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-center">
+            <h1><span class="fa fa-bug fa-4x"></span></h1>
+        </div>
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10 text-center">
+            <h1 clas="text-center">Algo salio mal</h1>
+            <p class="text-center">
+                Lo sentimos pero tenemos un problema con el sitio, un reporte ha 
+                sido enviado automaticamente para su reparación, por favor intentalo más tarde.
+            </p>
+            <p class="text-small">Error {{ status_code }}: {{ status_text }}</p>
+        </div>
+    </div>    
+{% endblock %}

@@ -1,0 +1,18 @@
+{% extends 'Frontend/Default/base.html.twig' %}
+{% block title %}{% endblock title %}
+{% block body %}
+    <div class="row alert alert-danger">
+        <div class="col-2 text-center">
+            <h1><span class="fa fa-frown fa-4x"></span></h1>
+        </div>
+        <div class="col-10 text-center">
+            <h1 class="text-center">
+                La pagina que esta buscando no existe o ha sido dado de baja.
+            </h1>
+            <p class="text-center">
+                Puede ser que se halla movido o se encuentre bajo otro nombre.
+            </p>
+            <p class="small">Error {{ status_code }}: {{ status_text }}</p>
+        </div>
+    </div>    
+{% endblock %}

@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Generales\Funciones;
 use App\Repository\DocumentoRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -56,10 +57,31 @@ class Documento
     private $fechaHoraVenta;
 
     /**
+     * @ORM\Column(name="crypt", type="string", length=255, nullable=true, unique=true)
+     */
+    private $crypt;
+
+    /**
+     * @ORM\Column(name="decrypt", type="string", length=255, nullable=true, unique=true)
+     */
+    private $decrypt;
+
+    /**
+     * @ORM\Column(name="user_cookie", type="string", length=50, nullable=true, unique=true)
+     */
+    private $userCookie;
+
+    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="documentos")
-     * @ORM\JoinColumn(name="cliente_id", nullable=false)
+     * @ORM\JoinColumn(name="cliente_id", nullable=true)
      */
     private $cliente;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=\App\Entity\ClienteDireccion::class)
+     * @ORM\JoinColumn(name="cliente_direccion_id", nullable=true)
+     */
+    private $clienteDireccion;
 
     /**
      * @ORM\OneToMany(targetEntity=DocumentoRegistro::class, mappedBy="Documento", orphanRemoval=true)
@@ -200,5 +222,85 @@ class Documento
         }
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getClienteDireccion()
+    {
+        return $this->clienteDireccion;
+    }
+
+    /**
+     * @param mixed $clienteDireccion
+     */
+    public function setClienteDireccion($clienteDireccion): void
+    {
+        $this->clienteDireccion = $clienteDireccion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCrypt()
+    {
+        return $this->crypt;
+    }
+
+    /**
+     * @param mixed $crypt
+     */
+    public function setCrypt($crypt): void
+    {
+        $this->crypt = $crypt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecrypt()
+    {
+        return $this->decrypt;
+    }
+
+    /**
+     * @param mixed $decrypt
+     */
+    public function setDecrypt($decrypt): void
+    {
+        $this->decrypt = $decrypt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUserCookie()
+    {
+        return $this->userCookie;
+    }
+
+    /**
+     * @param mixed $userCookie
+     */
+    public function setUserCookie($userCookie): void
+    {
+        $this->userCookie = $userCookie;
+    }
+
+    /**
+     * @ORM\PrePersist()
+     * @ORM\PreUpdate()
+     */
+    public function actualizarSeguridad()
+    {
+        $encryt = new Funciones();
+        $cadena = md5(random_int(-10000000, 10000000).date('Y-m-d g:i:s'));
+        $key = md5(random_int(-10000000, 10000000).date('Y-m-d g:i:s'));
+        if(empty($this->fechaHoraCreacion)){
+            $this->fechaHoraCreacion = new \DateTime();
+        }
+        $this->crypt = $encryt->encriptar($cadena, $key).','.$key;
+        $this->decrypt = $cadena;
     }
 }

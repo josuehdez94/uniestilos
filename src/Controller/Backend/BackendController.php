@@ -52,7 +52,7 @@ class BackendController extends AbstractController
             $usuarioActual = $entityManager->getRepository(User::class)->findOneById($user_id);
             $encoded = $passwordEncoder->encodePassword($this->getUser(), $form->get('plainPassword')->getData());
             $usuarioActual->setPassword($encoded);
-            //$entityManager->flush();
+            $entityManager->flush();
             $this->addFlash('general', 'Contraseña cambiada correctamente');
             return $this->redirectToRoute('backend_mi_perfil');
         }

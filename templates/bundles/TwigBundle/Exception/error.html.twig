@@ -1,0 +1,15 @@
+{% extends 'Frontend/Default/base.html.twig' %}
+{% block body %}
+    <div class="row alert alert-danger">
+        <div class="col-lg-2 col-md-2 col-sm-2 col-xs-2 text-center">
+            <h1><span class="glyphicons glyphicons-circle-question-mark x5"></span></h1>
+        </div>
+        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+            <h1 class="text-center">
+                Error. <br>
+                <small>Ocurrio un error grave al realizar su operación. Por favor intente más tarde.</small>
+            </h1>
+            <p>{{ status_text ? 'Error: ' ~ status_code ~ ' : ' ~ status_text }}</p>
+        </div>
+    </div>    
+{% endblock %}

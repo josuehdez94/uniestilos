@@ -3,13 +3,16 @@
 namespace App\Controller\Frontend;
 
 use App\Entity\User;
+use App\Form\Backend\ChangePassword\ChangePasswordFormType;
 use App\Form\Frontend\User\UserType;
+use App\Generales\Funciones;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+
 
 /**
  * @Route("/cliente")
@@ -39,11 +42,18 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            #encriptar datos
+            $encryt = new Funciones();
+            $cadena = md5(random_int(-20000, 50000).date('Y-m-d g:i:s'));
+            $key = md5(random_int(-50000, 20000).date('Y-m-d g:i:s'));
             $encoded = $passwordEncoder->encodePassword($user, $form->get('password')->getData());
             $clave = md5(date('Y-m-d g:i:s').random_int(-1000, 1000), false);
             $user->setPassword($encoded);
             $user->setTipoUser('C');
             $user->setClaveVerificacion($clave);
+            $user->setCrypt($encryt->encriptar($cadena, $key).','.$key);
+            $user->setDecrypt($cadena);
+            $user->setUid($cadena);
             $entityManager->persist($user);
             $entityManager->flush();
             $message = (new \Swift_Message('Bienvenido a TodoPartes'))

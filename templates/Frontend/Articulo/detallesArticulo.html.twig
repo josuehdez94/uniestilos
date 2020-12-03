@@ -103,7 +103,7 @@
                                             #imagenPrincipal img:active { cursor:url("{{asset('assets/img/front/grabbed.cur')}}"), default; }
                                         </style>
                                         <span class='zoom' id='imagenPrincipal'>
-                                            <img src="{{ articulo.fotografiaPrincipal ? articulo.fotografiaPrincipal.getWebNombreArchivo : articulo.getNoLogoImage }}" class="card-img-top" alt="..." id="imagenPrincipal-{{ articulo.id }}" style="max-width:680px;max-height:350px">
+                                            <img src="{{ articulo.fotografiaPrincipal ? articulo.fotografiaPrincipal.getWebNombreArchivo : articulo.getNoLogoImage }}" class="card-img-top" alt="..." id="imagenPrincipal-{{ articulo.id }}" style="max-width:650px;height:320px">
                                         </span>
                                         <script>
                                             $(document).ready(function(){        
@@ -116,8 +116,8 @@
                                         <div class="card-body">
                                             <div class="row">
                                                 {% for foto in articulo.fotografias %}
-                                                <div class="col-2">
-                                                    <img src="{{ foto.getWebMiniThumbnailNombreArchivo }}" class="card-img-top" alt="..." id="imagenChange-{{foto.id}}">
+                                                <div class="col-2 mr-2 ml-2">
+                                                    <img src="{{ foto.getWebThumbnailNombreArchivo }}" class="card-img-top" alt="..." id="imagenChange-{{foto.id}}" style="height: 60px; width: 90px">
                                                         <script>
                                                         $( "#imagenChange-{{foto.id}}" ).click(function() {
                                                             var url = "{{ foto.getWebNombreArchivo }}";
@@ -126,6 +126,7 @@
                                                         });
                                                     </script>
                                                 </div>
+                                                <br>
                                                 {% endfor %}
                                             </div>
                                         </div>

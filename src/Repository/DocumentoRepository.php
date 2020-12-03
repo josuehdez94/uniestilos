@@ -47,4 +47,37 @@ class DocumentoRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function getLastDocumentoId()
+    {
+        return $this->createQueryBuilder('d')
+            ->select('MAX (d.id)')
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
+
+    public function getLastDocumentoByUser($cliente)
+    {
+        return $this->createQueryBuilder('d')
+            ->select('MAX (d.id)')
+            ->andWhere('d.cliente = :cliente')
+            ->andWhere('d.tipo = C')
+            ->setParameter('cliente', $cliente)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
+
+    public function getLastDocumentoByUserAnon($cliente)
+    {
+        return $this->createQueryBuilder('d')
+            ->select('MAX (d.id)')
+            ->andWhere('d.userCookie = :cliente')
+            ->andWhere('d.tipo = C')
+            ->setParameter('cliente', $cliente)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
 }

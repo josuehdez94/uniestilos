@@ -82,6 +82,27 @@ class User implements UserInterface {
     protected $oldPassword;
 
     /**
+     * @ORM\Column(name="uid", type="string", length=100, nullable=false, unique=true)
+     */
+    private $uid;
+
+    /**
+     * @ORM\Column(name="crypt", type="string", length=255, nullable=true, unique=true)
+     */
+    private $crypt;
+
+    /**
+     * @ORM\Column(name="decrypt", type="string", length=255, nullable=true, unique=true)
+     */
+    private $decrypt;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=ClienteDireccion::class)
+     * @ORM\JoinColumn(name="direccion_principal_id", nullable=true)
+     */
+    private $direccionPrincipal;
+
+    /**
      * @ORM\OneToMany(targetEntity=Documento::class, mappedBy="cliente")
      */
     private $documentos;
@@ -91,10 +112,12 @@ class User implements UserInterface {
      */
     private $clienteDirecciones;
 
+
     public function __construct()
     {
         $this->documentos = new ArrayCollection();
         $this->clienteDirecciones = new ArrayCollection();
+        $this->direccionPrincipal = new ArrayCollection();
     }
 
     public function getId(): ?int {
@@ -350,6 +373,66 @@ class User implements UserInterface {
         }
 
         return $this;
+    }
+
+    public function getDireccionPrincipal(): ?ClienteDireccion
+    {
+        return $this->direccionPrincipal;
+    }
+
+    public function setDireccionPrincipal(?ClienteDireccion $direccionPrincipal): self
+    {
+        $this->direccionPrincipal = $direccionPrincipal;
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUid()
+    {
+        return $this->uid;
+    }
+
+    /**
+     * @param mixed $uid
+     */
+    public function setUid($uid): void
+    {
+        $this->uid = $uid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCrypt()
+    {
+        return $this->crypt;
+    }
+
+    /**
+     * @param mixed $crypt
+     */
+    public function setCrypt($crypt): void
+    {
+        $this->crypt = $crypt;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecrypt()
+    {
+        return $this->decrypt;
+    }
+
+    /**
+     * @param mixed $decrypt
+     */
+    public function setDecrypt($decrypt): void
+    {
+        $this->decrypt = $decrypt;
     }
 
 }

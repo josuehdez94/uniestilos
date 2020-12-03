@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * @ORM\Table(name="cliente_direccion")
  * @ORM\Entity(repositoryClass=ClienteDireccionRepository::class)
+ * @ORM\HasLifecycleCallbacks()
  */
 class ClienteDireccion
 {
@@ -67,6 +68,16 @@ class ClienteDireccion
     private $Referencias;
 
     /**
+     * @ORM\Column(name="crypt", type="string", length=255, nullable=true, unique=true)
+     */
+    private $crypt;
+
+    /**
+     * @ORM\Column(name="decrypt", type="string", length=255, nullable=true, unique=true)
+     */
+    private $decrypt;
+
+    /**
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="clienteDirecciones")
      * @ORM\JoinColumn(name="cliente_id", nullable=false)
      */
@@ -77,9 +88,51 @@ class ClienteDireccion
      */
     private $colonia;
 
+    /**
+     * @ORM\Column(name="eliminada", type="boolean")
+     */
+    private $eliminada = false;
+
+
+    /**
+     * @ORM\Column(name="uid", type="string", length=100, nullable=false, unique=true)
+     */
+    private $uid;
+
+    /**
+     * @ORM\Column(name="fecha_hora_creacion", type="datetime", nullable=true)
+     */
+    private $fechaHoraCreacion;
+
+    /**
+     * @ORM\Column(name="fecha_hora_edicion", type="datetime", nullable=true)
+     */
+    private $fechaHoraEdicion;
+
+    /**
+     * @ORM\Column(name="fecha_hora_eliminada", type="datetime", nullable=true)
+     */
+    private $fechaHoraEliminada;
+
+
     public function __construct()
     {
-        //$this->municipio = new ArrayCollection();
+        $this->fechaHoraCreacion = new \DateTime();
+        $uid = md5(date('Y-m-d g:i:s'));
+        $this->uid = $uid;
+    }
+
+    /**
+     * @ORM\PreUpdate()
+     * @ORM\PrePersist()
+     */
+    public function onUpdate()
+    {
+        if(empty($this->uid)){
+            $uid = md5(date('Y-m-d g:i:s'));
+            $this->uid = $uid;
+        }
+        $this->fechaHoraEdicion = new \DateTime();
     }
 
     public function getId(): ?int
@@ -243,4 +296,129 @@ class ClienteDireccion
 
         return $this;
     }
+
+    public function direccionCompleta()
+    {
+
+        isset($this->numeroInterior) ? $numeroInterior = 'Int. '.$this->numeroInterior : $numeroInterior = '';
+
+        $direccion = ucwords($this->calle).' #'.$this->numeroExterior.' '.$numeroInterior.' '.ucwords($this->colonia).' '.$this->getMunicipio()->getEstado()->getNombre().','.$this->getMunicipio()->getNombre().' CP: '.$this->codigoPostal;
+        //$direccion = $this->calle;
+        return $direccion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCrypt()
+    {
+        return $this->crypt;
+    }
+
+    /**
+     * @param mixed $crypt
+     */
+    public function setCrypt($crypt)
+    {
+        $this->crypt = $crypt;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDecrypt()
+    {
+        return $this->decrypt;
+    }
+
+    /**
+     * @param mixed $crypt
+     */
+    public function setDecrypt($decrypt)
+    {
+        $this->decrypt = $decrypt;
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUid()
+    {
+        return $this->uid;
+    }
+
+    /**
+     * @param mixed $uid
+     */
+    public function setUid($uid): void
+    {
+        $this->uid = $uid;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFechaHoraCreacion()
+    {
+        return $this->fechaHoraCreacion;
+    }
+
+    /**
+     * @param mixed $fechaHoraCreacion
+     */
+    public function setFechaHoraCreacion($fechaHoraCreacion): void
+    {
+        $this->fechaHoraCreacion = $fechaHoraCreacion;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFechaHoraEdicion()
+    {
+        return $this->fechaHoraEdicion;
+    }
+
+    /**
+     * @param mixed $fechaHoraEdicion
+     */
+    public function setFechaHoraEdicion($fechaHoraEdicion): void
+    {
+        $this->fechaHoraEdicion = $fechaHoraEdicion;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEliminada(): bool
+    {
+        return $this->eliminada;
+    }
+
+    /**
+     * @param bool $eliminada
+     */
+    public function setEliminada(bool $eliminada): void
+    {
+        $this->eliminada = $eliminada;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFechaHoraEliminada()
+    {
+        return $this->fechaHoraEliminada;
+    }
+
+    /**
+     * @param mixed $fechaHoraEliminada
+     */
+    public function setFechaHoraEliminada($fechaHoraEliminada): void
+    {
+        $this->fechaHoraEliminada = $fechaHoraEliminada;
+    }
+
 }

@@ -5,6 +5,14 @@
     <div id="all">
         <div id="content">
             <div class="container">
+                <!-- breadcrumb-->
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{{ url('frontend_home_page') }}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a href="{{ url('front_user_micuenta') }}">Mi cuenta</a></li>
+                        <li aria-current="page" class="breadcrumb-item active">Mis direcciones</li>
+                    </ol>
+                </nav>
                 {% for label, messages in app.flashes(['Editado', 'Eliminado', 'Creado']) %}
                     {% for message in messages %}
                         <div class="col-md-8">
@@ -31,12 +39,41 @@
                         </div>
                     </div>
                     {% for direccion in direcciones %}
-                    <div class="col-md-4">
-                        <div class="box clickable d-flex flex-column justify-content-center mb-0 h-100">
-                            <h3><a href="#">{{ direccion.nombreCompleto|capitalize }}</a></h3>
-                            <p class="mb-0">{{ direccion.direccionCompleta }}</p>
+                    <div class="col-md-4 ">
+                        <div class="box d-flex flex-column justify-content-center mb-0 h-100">
+                            <h5><a href="#">{{ direccion.nombreCompleto|capitalize }}</a></h5>
+                            <p class="mb-0"><small class="text-secondary">{{ direccion.direccionCompleta }}</small></p>
+                            {% if direccion.referencias is not null %}
+                            <div class="mt-2">
+                                <small class="text-secondary">Referencias: {{ direccion.referencias }}</small>
+                            </div>
+                            {% endif %}
+                            {% if direccion.instrucionesEntrega is not null %}
+                                <div class="mt-2">
+                                    <small class="text-secondary">Instrucciones: {{ direccion.instrucionesEntrega }}</small>
+                                </div>
+                            {% endif %}
+                            </hr>
+                            <div class="mt-5">
+                                <small>
+                                    <a href="{{ url('front_cliente_direccion_editar', {'uid': direccion.uid, 'crypt' : direccion.crypt }) }}">Editar</a>
+                                    {% if app.user.direccionPrincipal is not null and app.user.direccionPrincipal.id != direccion.id %}
+                                    <form method="POST" action="{{ url('front_cliente_direccion_eliminar', {'uid': direccion.uid, 'crypt' : direccion.crypt }) }}">
+                                        <input type="hidden" name="token" value="{{ csrf_token(direccion.uid) }}"/>
+                                        <input type="submit" class="btn btn-sm btn-link" value="Eliminar">
+                                    </form>
+                                    {% endif %}
+                                    {% if app.user.direccionPrincipal is not null and app.user.direccionPrincipal.id == direccion.id %}
+                                         <span class="text-info">Predeterminada</span>
+                                    {% else %}
+                                        <form method="POST" action="{{ url('front_cliente_direccion_elegir', {'uid': direccion.uid, 'crypt' : direccion.crypt }) }}">
+                                        <input type="hidden" name="token" value="{{ csrf_token(direccion.uid) }}"/>
+                                         <input type="submit" class="btn btn-sm btn-link" value="Establecer principal">
+                                        </form>
+                                    {% endif %}
+                                </small>
+                            </div>
                         </div>
-                        <br>
                     </div>
                     {% else %}
                     <div class="col-md-4">
