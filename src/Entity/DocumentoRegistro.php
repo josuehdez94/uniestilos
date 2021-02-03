@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\DocumentoRegistroRepository;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
@@ -33,6 +34,7 @@ class DocumentoRegistro
      */
     private $precio;
 
+
     /**
      * @ORM\Column(name="total", type="decimal", precision=10, scale=2, nullable=true)
      */
@@ -60,6 +62,11 @@ class DocumentoRegistro
      */
     private $promocion;
 
+    public function __construct()
+    {
+        $this->fechaHoraCreacion = new \DateTime();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -82,79 +89,79 @@ class DocumentoRegistro
         return $this->cantidad;
     }
 
-    public function setCantidad(int $cantidad): self
+    public function setCantidad($cantidad)
     {
         $this->cantidad = $cantidad;
 
         return $this;
     }
 
-    public function getPrecio(): ?string
+    public function getPrecio()
     {
         return $this->precio;
     }
 
-    public function setPrecio(string $precio): self
+    public function setPrecio($precio)
     {
         $this->precio = $precio;
 
         return $this;
     }
 
-    public function getTotal(): ?string
+    public function getTotal()
     {
         return $this->total;
     }
 
-    public function setTotal(?string $total): self
+    public function setTotal($total)
     {
         $this->total = $total;
 
         return $this;
     }
 
-    public function getArticulo(): ?articulo
+    public function getArticulo()
     {
         return $this->articulo;
     }
 
-    public function setArticulo(?articulo $articulo): self
+    public function setArticulo($articulo)
     {
         $this->articulo = $articulo;
 
         return $this;
     }
 
-    public function getDocumento(): ?Documento
+    public function getDocumento()
     {
         return $this->Documento;
     }
 
-    public function setDocumento(?Documento $Documento): self
+    public function setDocumento($Documento)
     {
         $this->Documento = $Documento;
 
         return $this;
     }
 
-    public function getDescuento(): ?string
+    public function getDescuento()
     {
         return $this->descuento;
     }
 
-    public function setDescuento(?string $descuento): self
+    public function setDescuento($descuento)
     {
         $this->descuento = $descuento;
 
         return $this;
     }
 
-    public function getPromocion(): ?bool
+    public function getPromocion()
     {
         return $this->promocion;
     }
 
-    public function setPromocion(?bool $promocion): self
+    public function setPromocion($promocion)
     {
         $this->promocion = $promocion;
 

@@ -4,6 +4,7 @@ namespace App\Controller\Frontend;
 
 use App\Entity\User;
 use App\Form\Frontend\User\CambiarUsuarioType;
+use App\Form\Frontend\User\ChangePasswordFormType;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;

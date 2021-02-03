@@ -91,6 +91,7 @@ class Documento
     public function __construct()
     {
         $this->registros = new ArrayCollection();
+        $this->fechaHoraCreacion = new \DateTime();
     }
 
     public function getId(): ?int

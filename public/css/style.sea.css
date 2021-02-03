@@ -1997,6 +1997,9 @@ body {
   line-height: 1.5;
   color: #212529;
   background-color: #f0f0f0;
+  /*background-image: url('../assets/img/christmas.png');
+  background-repeat: no-repeat;
+  background-size: cover;*/
 }
 
 a {

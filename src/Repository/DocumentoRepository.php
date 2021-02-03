@@ -62,8 +62,9 @@ class DocumentoRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('d')
             ->select('MAX (d.id)')
             ->andWhere('d.cliente = :cliente')
-            ->andWhere('d.tipo = C')
+            ->andWhere('d.tipo = :tipo')
             ->setParameter('cliente', $cliente)
+            ->setParameter('tipo', 'C')
             ->getQuery()
             ->getOneOrNullResult()
             ;
@@ -78,6 +79,17 @@ class DocumentoRepository extends ServiceEntityRepository
             ->setParameter('cliente', $cliente)
             ->getQuery()
             ->getOneOrNullResult()
-            ;
+        ;
+    }
+
+    public function getTotalArticulosByDocumento($documento){
+        return $this->createQueryBuilder('d')
+            ->select('SUM (dg.cantidad) as cantidad')
+            ->innerJoin('\App\Entity\DocumentoRegistro', 'dg', 'WITH', 'd.id = dg.Documento')
+            ->andWhere('d.id = :documento')
+            ->setParameter('documento', $documento)
+            ->getQuery()
+            ->getOneOrNullResult()
+        ;
     }
 }

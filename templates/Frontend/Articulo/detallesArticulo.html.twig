@@ -137,22 +137,40 @@
                                 <div class="box" data-aos="zoom-out-right">
                                     <h4 class="text-center">{{ articulo.descripcion }}</h4>
                                     <p class="goToDescription text-secondary"><span>Sku: </span>{{ articulo.sku }}</p>
-                                    <p class="price">{{ articulo.precio1 is not null ? '$' ~ articulo.precio1 : 'Este articulo aun no cuenta con precio'}}</p>
-                                    <p class="text-center buttons">
-                                        <a href="basket.html" class="btn btn-primary mt-1"><i class="fa fa-shopping-cart"></i> Añadir al carrito</a>
-                                        {#<a href="basket.html" class="btn btn-outline-primary"><i class="fa fa-heart"></i> Add to wishlist</a>#}
-                                        <script
-                                            src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
-                                            data-preference-id="{{ preference.id }}">
-                                        </script>
-                                        <script>
-                                            $( document ).ready(function() {
-                                                $('.mercadopago-button').html('Comprar Ahora');
-                                                $('.mercadopago-button').addClass('btn btn-sm btn-');
-                                            });
-                                        </script>
-                                    </p>
-                                    
+                                    {% if app.user is not null %}
+                                    <form method="POST" action="{{ url('front_carrito_agregar_articulo', {'user_uid': app.user.uid, 'crypt': app.user.crypt}) }}">
+                                    {% else %}
+                                    <form method="POST">
+                                    {% endif %}
+                                        <p class="price">
+                                            <input type="hidden" name="precio" value="{{ articulo.precio1 }}">
+                                            {{ articulo.precio1 is not null ? '$' ~ articulo.precio1 : 'Este articulo aun no cuenta con precio'}}
+                                        </p>
+                                        <p>
+                                            <select class="fom-control" name="cantidad">
+                                                <option selected value="1">1</option>
+                                                {% for i in 2..5 %}
+                                                    <option value="{{ i }}">{{ i }}</option>
+                                                {% endfor %}
+                                            </select>
+                                        </p>
+                                        <p class="text-center buttons">
+                                            <input type="hidden" name="articulo" value="{{ articulo.id }}"/>
+                                            <input type="hidden" name="token" value="{{ csrf_token(articulo.urlAmigable) }}"/>
+                                            <button type="submit" class="btn btn-primary mt-1"><i class="fa fa-shopping-cart"></i> Añadir al carrito</button>
+                                            {#<a href="basket.html" class="btn btn-outline-primary"><i class="fa fa-heart"></i> Add to wishlist</a>
+                                            <script
+                                                src="https://www.mercadopago.com.mx/integrations/v1/web-payment-checkout.js"
+                                                data-preference-id="{{ preference.id }}">
+                                            </script>
+                                            <script>
+                                                $( document ).ready(function() {
+                                                    $('.mercadopago-button').html('Comprar Ahora');
+                                                    $('.mercadopago-button').addClass('btn btn-sm btn-');
+                                                });
+                                            </script>#}
+                                        </p>
+                                    </form>
                                 </div>
                                 <div data-slider-id="1" class="owl-thumbs">
                                     <button class="owl-thumb-item"><img src="img/detailsquare.jpg" alt="" class="img-fluid"></button>
