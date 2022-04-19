@@ -68,10 +68,25 @@ class ArticuloFotografiaController extends AbstractController
 
         }
         $this->addFlash('Editado', 'Se han añadido nuevas fotografias');
-        return $this->redirectToRoute('backend_articulo_editar', [
+        return $this->redirectToRoute('backend_articulo_fotografia_editar', [
             'id' => $articulo->getId()
         ]);
        
+    }
+
+    /**
+     * @Route("/editar/{id}", name="backend_articulo_fotografia_editar", methods={"GET", "POST"})
+     */
+    public function editarFotografias($id){
+        $entityManager = $this->getDoctrine()->getManager();
+        $articulo = $entityManager->getRepository(\App\Entity\Articulo::class)->findOneBy(['id' => $id]);
+        if(!$articulo){
+            throw $this->createNotFoundException('Articulo no encontrado');
+        }
+        return $this->render('backend/ArticuloFotografia/editarFotografias.html.twig', [
+            'articulo' => $articulo,
+            'submenu' => 'fotografias',
+        ]);
     }
 
     /**

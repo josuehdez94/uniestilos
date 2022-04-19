@@ -46,7 +46,7 @@
                     <td>{{ articulo.sku }}</td>
                     <td>{{ articulo.descripcion }}</td>
                     <td>
-                        <a class="mx-2" href="{{ url('backend_categoria_detalles', {'id': articulo.id}) }}">
+                        <a class="mx-2" href="{{ url('backend_articulo_detalles', {'id': articulo.id}) }}">
                             <i class="far fa-eye text-info"></i>
                         </a>
                         <a class="mx-2" href="{{ path('backend_articulo_editar', {'id': articulo.id}) }}">

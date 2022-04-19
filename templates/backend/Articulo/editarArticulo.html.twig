@@ -52,6 +52,9 @@
         <li class="nav-item" role="presentation">
             <a class="nav-link" id="fotografias-tab" data-toggle="tab" href="#fotografias" role="tab" aria-controls="fotografias" aria-selected="false">Fotografias</a>
         </li>
+        <li class="nav-item">
+            <a class="nav-link" id="descripcion-tab" href="{{ url('backend_articulo_descripcion', {'articulo_id': articulo.id}) }}">Descripción</a>
+        </li>
     </ul>
     <div class="tab-content" id="myTabContent">
         <div class="tab-pane fade show active mt-3" id="datosGenerales" role="tabpanel" aria-labelledby="datosGenerales-tab">

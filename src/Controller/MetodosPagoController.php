@@ -13,8 +13,10 @@ class MetodosPagoController extends AbstractController
      */
     public function index(): Response
     {
-        return $this->render('metodos_pago/index.html.twig', [
-            'controller_name' => 'MetodosPagoController',
-        ]);
+        $entityManager = $this->getDoctrine()->getManager();
+        $articulo = $entityManager->getRepository(\App\Entity\Articulo::class)->findOneBy(['id' => 1]);
+        $articulo->setPrecio1(500);
+        $entityManager->flush();
+        return new Response('success');
     }
 }

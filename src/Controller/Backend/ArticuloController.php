@@ -50,31 +50,45 @@ class ArticuloController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="articulo_show", methods={"GET"})
+     * @Route("/detalles/{id}", name="backend_articulo_detalles", methods={"GET"})
      */
-    public function show(Articulo $articulo): Response
+    public function detallesArticulo($id): Response
     {
-        return $this->render('articulo/show.html.twig', [
-            'articulo' => $articulo,
+        $entityManager = $this->getDoctrine()->getManager();
+        $articulo = $entityManager->getRepository(\App\Entity\Articulo::class)->findOneBy(['id' => $id]);
+        if(!$articulo){
+            throw $this->createNotFoundException('Articulo no encontrado');
+        }
+        return $this->render('backend/Articulo/detallesArticulo.html.twig', [
+            'articulo' => $articulo
         ]);
     }
 
     /**
-     * @Route("/editar/{id}", name="backend_articulo_editar", methods={"GET","POST"})
+     * @Route("/editar/generales/{id}", name="backend_articulo_editar", methods={"GET","POST"})
      */
-    public function editarArticulo(Request $request, Articulo $articulo): Response
+    public function editarArticulo(Request $request, $id): Response
     {
+        $entityManager = $this->getDoctrine()->getManager();
+        $articulo = $entityManager->getRepository(Articulo::class)->findOneBy(['id' => $id]);
+        if(!$articulo){
+            throw $this->createNotFoundException('Articulo no encontrado');
+        }
         $form = $this->createForm(ArticuloType::class, $articulo);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
+            $articulo->setUsuarioEditor($this->getUser());
+            $entityManager->flush();
             $this->addFlash('Editado', 'El articulo ha sido editado correctamente');
-            return $this->redirectToRoute('backend_articulo_index');
+            return $this->redirectToRoute('backend_articulo_editar', [
+                'id' => $articulo->getId()
+            ]);
         }
 
-        return $this->render('backend/Articulo/editarArticulo.html.twig', [
+        return $this->render('backend/Articulo/editarArticuloGenerales.html.twig', [
             'articulo' => $articulo,
+            'submenu' => 'generales',
             'form' => $form->createView(),
         ]);
     }

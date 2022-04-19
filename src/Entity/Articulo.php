@@ -130,6 +130,11 @@ class Articulo
      */
     private $documentoRegistros;
 
+    /**
+     * @ORM\OneToOne(targetEntity=ArticuloDescripcion::class, mappedBy="articulo", cascade={"persist", "remove"})
+     */
+    private $articuloDescripcion;
+
     public function __construct()
     {
         $this->fechahoraCreacion = new \DateTime();
@@ -382,6 +387,23 @@ class Articulo
             if ($documentoRegistro->getArticulo() === $this) {
                 $documentoRegistro->setArticulo(null);
             }
+        }
+
+        return $this;
+    }
+
+    public function getArticuloDescripcion(): ?ArticuloDescripcion
+    {
+        return $this->articuloDescripcion;
+    }
+
+    public function setArticuloDescripcion(ArticuloDescripcion $articuloDescripcion): self
+    {
+        $this->articuloDescripcion = $articuloDescripcion;
+
+        // set the owning side of the relation if necessary
+        if ($articuloDescripcion->getArticulo() !== $this) {
+            $articuloDescripcion->setArticulo($this);
         }
 
         return $this;

@@ -117,7 +117,6 @@ class User implements UserInterface {
     {
         $this->documentos = new ArrayCollection();
         $this->clienteDirecciones = new ArrayCollection();
-        $this->direccionPrincipal = new ArrayCollection();
     }
 
     public function getId(): ?int {
