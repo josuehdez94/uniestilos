@@ -158,7 +158,7 @@ class ResetPasswordController extends AbstractController
             ));*/
 
             //return $this->redirectToRoute('app_check_email');
-            $this->addFlash('reset_password_error', 'ocurrio un error al generar la clave de restablecimiento de contraseña');
+            $this->addFlash('reset_password_error', 'ocurrio un error al generar la clave de restablecimiento de contraseña'.$e);
             return $this->redirectToRoute('app_forgot_password_request');
         }
 

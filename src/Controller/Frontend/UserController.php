@@ -12,6 +12,8 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 
 /**
@@ -34,7 +36,7 @@ class UserController extends AbstractController
     /**
      * @Route("/registro", name="front_user_nuevo", methods={"GET","POST"})
      */
-    public function nuevoRegistro(Request $request, UserPasswordEncoderInterface $passwordEncoder, \Swift_Mailer $mailer): Response
+    public function nuevoRegistro(Request $request, UserPasswordEncoderInterface $passwordEncoder, MailerInterface $mailer): Response
     {
         $entityManager = $this->getDoctrine()->getManager();
         $user = new User();
@@ -42,36 +44,45 @@ class UserController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            #encriptar datos
-            $encryt = new Funciones();
-            $cadena = md5(random_int(-20000, 50000).date('Y-m-d g:i:s'));
-            $key = md5(random_int(-50000, 20000).date('Y-m-d g:i:s'));
-            $encoded = $passwordEncoder->encodePassword($user, $form->get('password')->getData());
-            $clave = md5(date('Y-m-d g:i:s').random_int(-1000, 1000), false);
-            $user->setPassword($encoded);
-            $user->setTipoUser('C');
-            $user->setClaveVerificacion($clave);
-            $user->setCrypt($encryt->encriptar($cadena, $key).','.$key);
-            $user->setDecrypt($cadena);
-            $user->setUid($cadena);
-            $entityManager->persist($user);
-            $entityManager->flush();
-            $message = (new \Swift_Message('Bienvenido a TodoPartes'))
-                    ->setFrom('no-contestar@nicenmt.mx')
-                    ->setTo($user->getEmail())
-                    ->setBody(
-                    $this->renderView(
+            $entityManager->getConnection()->beginTransaction();
+            try {
+                #encriptar datos
+                $encryt = new Funciones();
+                $cadena = md5(random_int(-20000, 50000).date('Y-m-d g:i:s'));
+                $key = md5(random_int(-50000, 20000).date('Y-m-d g:i:s'));
+                $encoded = $passwordEncoder->encodePassword($user, $form->get('password')->getData());
+                $clave = md5(date('Y-m-d g:i:s').random_int(-1000, 1000), false);
+                $user->setPassword($encoded);
+                $user->setTipoUser('C');
+                $user->setClaveVerificacion($clave);
+                $user->setCrypt($encryt->encriptar($cadena, $key).','.$key);
+                $user->setDecrypt($cadena);
+                $user->setUid($cadena);
+                $entityManager->persist($user);
+                $entityManager->flush();
+                $message = (new Email())
+                        ->from('contacto@uniestilos.shop')
+                        ->to($user->getEmail())
+                        ->subject('Bienvenid(a) a uniestilos!')
+                        ->html($this->renderView(
                             'Frontend/User/Correos/validarCuenta.html.twig', [
                                 'nombre' => $user->nombreCompleto(),
                                 'cadena' => $user->getClaveVerificacion(),
                                 'correo' => $user->getEmail()
                             ]
-                    ),
-                    'text/html'
-                    )
-            ;
+                            ),
+                        'text/html'
+                        )
+                ;
 
-            $mailer->send($message);
+                $mailer->send($message);
+                #comit de todos los flush
+                $entityManager->getConnection()->commit();
+            }catch (\Exception $e) {
+                #rollback de todos los flush
+                $entityManager->getConnection()->rollBack();
+                throw $this->createNotFoundException($e);
+            }
             $this->addFlash('Creado', 'Cuenta creada exitosamente, por favor verifica tu cuenta, te hemos enviado una clave a '. $user->getEmail());
             return $this->redirectToRoute('front_user_nuevo');
         }
