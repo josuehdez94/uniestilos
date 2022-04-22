@@ -1,0 +1,76 @@
+{% extends 'backend/Default/homePage.html.twig' %}
+{% block title %}Log errores{% endblock %}
+{% set menu = 'configuracion' %}
+{% set list = 'errores' %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-6">
+            <h3>Log de errores</h3>
+        </div>
+    </div>
+    {% for message in app.flashes('log') %}
+        <div class="row">
+            <div class="col-lg-6 col-md-6" style="margin-top: 10px;">
+                <div class="alert alert-success alert-dismissible fade in" id="success" role="alert">
+                    <button aria-label="Close" class="close" data-dismiss="alert" type="button">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                    {{ message }}
+                </div>
+            </div>
+        </div>
+        <script>
+            $("#success").fadeTo(3000, 500).slideUp(500, function () {
+                $("#success").alert('close');
+            });
+        </script>
+    {% endfor %}
+    <hr>
+
+    <div class="row">
+        <div class="col-12">
+            <table class="table table-hover table-bordered">
+                <thead class="thead-light text-center">
+                    <tr>
+                        <th>Id</th>
+                        <th>Created At</th>
+
+                        <th>Level</th>
+                        <th>Level Name</th>
+                        <th>Message</th>
+                        <th>Context</th> 
+                            {#<th>Extra</th>#}
+
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    {% for log in logs %}
+                        <tr>
+                            <td>{{ log.id }}</td>
+                            <td>{{ log.createdAt|date('d/m/Y H:i:s') }}</td>
+
+                            <td>{{ log.level }}</td>
+                            <td>{{ log.levelName }}</td>
+                            <td>{{ log.message }}</td>
+                            <td>{{ log.context }}</td>
+                            {#<td>{{ log.extra|slice(0, 200) }}#}
+                            </td>
+
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="10">No hay registros</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {# {{ knp_pagination_render(logs, null, {}, {
+                            'size': 'small',
+                            'rounded': false,
+                            'align' : 'center'
+                            }) }} #}
+        </div>
+    </div>
+
+{% endblock content %}
