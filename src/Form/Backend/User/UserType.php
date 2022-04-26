@@ -79,11 +79,11 @@ class UserType extends AbstractType
                 ],
                 'constraints' => [
                     new NotBlank([
-                        'message' => 'Por favor ingresa un nombre(s)',
+                        'message' => 'Por favor ingresa un correo valido',
                     ]),
                     new Length([
                         'min' => 3,
-                        'max' => 20,
+                        'max' => 50,
                         'minMessage' => 'Tu nombre deberia contener minimo {{ limit }} caracteres',
                         // max length allowed by Symfony for security reasons
                         'maxMessage' => 'Tu nombre deberia contener maximo {{ limit }} caracteres',

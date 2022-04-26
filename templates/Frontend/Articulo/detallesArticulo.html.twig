@@ -103,7 +103,7 @@
                                             #imagenPrincipal img:active { cursor:url("{{asset('assets/img/front/grabbed.cur')}}"), default; }
                                         </style>
                                         <span class='zoom' id='imagenPrincipal'>
-                                            <img src="{{ articulo.fotografiaPrincipal ? articulo.fotografiaPrincipal.getWebNombreArchivo : articulo.getNoLogoImage }}" class="card-img-top" alt="..." id="imagenPrincipal-{{ articulo.id }}" style="max-width:650px;height:320px">
+                                            <img src="{{ articulo.fotografiaPrincipal ? articulo.fotografiaPrincipal.getFotografiaL : articulo.getNoLogoImage }}" class="card-img-top" alt="..." id="imagenPrincipal-{{ articulo.id }}" style="max-width:650px;height:320px">
                                         </span>
                                         <script>
                                             $(document).ready(function(){        
@@ -117,10 +117,10 @@
                                             <div class="row">
                                                 {% for foto in articulo.fotografias %}
                                                 <div class="col-2 mr-2 ml-2">
-                                                    <img src="{{ foto.getWebThumbnailNombreArchivo }}" class="card-img-top" alt="..." id="imagenChange-{{foto.id}}" style="height: 60px; width: 90px">
+                                                    <img src="{{ foto.getFotografiaS }}" class="card-img-top" alt="..." id="imagenChange-{{foto.id}}" style="height: 60px; width: 90px">
                                                         <script>
                                                         $( "#imagenChange-{{foto.id}}" ).click(function() {
-                                                            var url = "{{ foto.getWebNombreArchivo }}";
+                                                            var url = "{{ foto.getFotografiaXL }}";
                                                             $('#imagenPrincipal-{{ articulo.id }}').attr('src', url);
                                                             $('img[class="zoomImg"]').attr('src', url);
                                                         });

@@ -1,0 +1,91 @@
+<div class="container contenido">
+    <div class="row">
+        {% for foto in fotografias %}
+        <div class="col-lg-4 col-md-4 col-sm-12">
+            <div class="card mb-3 text-center" style="max-height:300px;min-height:300px">
+                <div class="card-header">
+                    {% if articulo.fotografiaprincipal is not null and articulo.fotografiaPrincipal.id == foto.id %}
+                        <span class="btn btn-sm btn-link text-dark">Foto principal</span>
+                    {% else %}
+                        <span class="btn btn-sm btn-link text-dark">Foto</span>
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-5 col-md-6 col-6">
+                            {# <img class="img-fluid img-responsive" src="{{foto.getWebThumbnailNombreArchivo}}" alt="Card image cap"> #}
+                            <picture>
+                                <source srcset="{{foto.getWebThumbnailNombreArchivo}}" type="image/svg+xml">
+                                <img src="{{foto.getWebThumbnailNombreArchivo}}" class="img-fluid rounded-circle img-thumbnail" alt="...">
+                            </picture>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer form-inline text-center">
+                    <form method="POST", action="{{ url('backend_articulo_fotografia_eliminar', {'id': foto.id }) }}">
+                        <input type="submit" class="btn btn-sm btn-link text-danger" value="Eliminar" />
+                    </form>
+                    {% if articulo.fotografiaprincipal is not null and articulo.fotografiaPrincipal.id != foto.id %}
+                        <form method="POST", action="{{ url('backend_articulo_fotografia_principal', {'id': foto.id }) }}">
+                            <input type="submit" class="btn btn-sm btn-link text-success" value="Principal" />
+                        </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <ul class="pagination justify-content-center">
+                {{ knp_pagination_render(fotografias, null, {}, {
+                            'size': 'small',
+                            'rounded': false,
+                            }) }}
+            </ul>
+        </div>
+    </div>
+    <script>
+        function paginator(url) {
+            $.ajax({
+                type: "GET",
+                url: url,
+                beforeSend: function (s) {
+                    $('#loading').text('Cargando...');
+                    $('#loading').removeClass('d-none');
+                },
+                success: function (s) {
+                    rs = JSON.parse(s);
+                    if (rs.type == 'load') {
+                        $('.fotografias .contenido').empty();
+                        $('.fotografias .contenido').html(rs.content);
+                    } else {
+                        swal({title: "Oops", text: rs.message, timer: 4000, icon: "error", button: false, });
+                    }
+                    $('#loading').addClass('d-none');
+                },
+                error: function (s) {
+                    $('#loading').addClass('d-none');
+                    swal({title: "Oops", text: 'Error en la peticion', timer: 3000, icon: "error", button: false, });
+                }
+            });
+            return false;
+        }
+        $('a[class="desc"]').on('click', function (e) {
+            e.preventDefault();
+            paginator($(this).attr('href'));
+        });
+        $('a[class="asc"]').on('click', function (e) {
+            e.preventDefault();
+            paginator($(this).attr('href'));
+        });
+        $('a[class="sortable"]').on('click', function (e) {
+            e.preventDefault();
+            paginator($(this).attr('href'));
+        });
+        $('a[class="page-link"]').on('click', function (e) {
+            e.preventDefault();
+            paginator($(this).attr('href'));
+        });
+    </script>
+</div>

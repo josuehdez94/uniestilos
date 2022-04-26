@@ -96,6 +96,12 @@
             "config/packages/fos_ckeditor.yaml"
         ]
     },
+    "knplabs/knp-components": {
+        "version": "v3.5.0"
+    },
+    "knplabs/knp-paginator-bundle": {
+        "version": "v5.8.0"
+    },
     "mercadopago/dx-php": {
         "version": "2.2.0"
     },

@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
@@ -37,7 +38,7 @@ class ResetPasswordController extends AbstractController
      *
      * @Route("", name="app_forgot_password_request")
      */
-    public function request(Request $request, \Swift_Mailer $mailer): Response
+    public function request(Request $request, MailerInterface $mailer): Response
     {
         $form = $this->createForm(ResetPasswordRequestFormType::class);
         $form->handleRequest($request);
@@ -131,7 +132,7 @@ class ResetPasswordController extends AbstractController
         ]);
     }
 
-    private function processSendingPasswordResetEmail(string $emailFormData, \Swift_Mailer $mailer): RedirectResponse
+    private function processSendingPasswordResetEmail(string $emailFormData, MailerInterface $mailer): RedirectResponse
     {
         $user = $this->getDoctrine()->getRepository(User::class)->findOneBy([
             'email' => $emailFormData,
@@ -141,7 +142,7 @@ class ResetPasswordController extends AbstractController
 
         // Do not reveal whether a user account was found or not.
         if(!$user){
-           $this->addFlash('reset_password_error', 'El email ingresado no tiene cuenta en nicenmt');
+           $this->addFlash('reset_password_error', 'El email ingresado no tiene cuenta en uniestilos');
            return $this->redirectToRoute('app_forgot_password_request'); 
         }
 
@@ -175,19 +176,19 @@ class ResetPasswordController extends AbstractController
         //$resetToken = hash('sha512', date('Y-m-d g:i:s'));
         //$resetToken = $this->resetPasswordHelper->generateResetToken($user);
         
-        $message = (new \Swift_Message('Restablecer contraseña'))
-        ->setFrom('resetpassword@nicenmt.com')
-        ->setTo('pruebastodopartes@gmail.com')
-        ->setBody(
-            $this->renderView(
-                //templates/emails/registration.html.twig
-                'backend/ResetPassword/email.html.twig',
-                ['resetToken' => $resetToken,
-                   'tokenLifetime' => $this->resetPasswordHelper->getTokenLifetime(),
+        $message = (new Email())
+                ->from('contacto@uniestilos.shop')
+                ->to($user->getEmail())
+                ->subject('Contraseña restablecida')
+                ->html($this->renderView(
+                    'backend/ResetPassword/email.html.twig', [
+                        'resetToken' => $resetToken,
+                        'tokenLifetime' => $this->resetPasswordHelper->getTokenLifetime(),
                     ]
-            ),
-            'text/html'
-        );
+                    ),
+                'text/html'
+                )
+        ;
 
         $mailer->send($message);
 

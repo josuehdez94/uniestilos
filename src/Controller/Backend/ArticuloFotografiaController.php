@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Knp\Component\Pager\PaginatorInterface;
 
 /**
  * @Route("/backend/fotografias")
@@ -35,7 +36,7 @@ class ArticuloFotografiaController extends AbstractController
                /* if ($ancho > 300 && $ancho < 1000){
                     if ($alto > 600 && $alto < 1000){ */
                         $nombreArchivoBd = hash('md5', date('Y-m-d g:i:s').random_int(0, 4000000)).'.'.substr($nombreArchivo,strrpos($nombreArchivo,'.')+1);
-                        $this->subirFotografias($temp, $nombreArchivoBd);
+                        $this->subirFotografias2($temp, $nombreArchivoBd);
                         $fotografia = new \App\Entity\ArticuloFotografia();
                         $fotografia->setArticulo($articulo);
                         $fotografia->setUsuarioSubio($this->getUser());
@@ -77,14 +78,30 @@ class ArticuloFotografiaController extends AbstractController
     /**
      * @Route("/editar/{id}", name="backend_articulo_fotografia_editar", methods={"GET", "POST"})
      */
-    public function editarFotografias($id){
+    public function editarFotografias(Request $request, PaginatorInterface $paginator, $id){
         $entityManager = $this->getDoctrine()->getManager();
         $articulo = $entityManager->getRepository(\App\Entity\Articulo::class)->findOneBy(['id' => $id]);
         if(!$articulo){
             throw $this->createNotFoundException('Articulo no encontrado');
         }
+        $fotografias = $paginator->paginate(
+            $entityManager->getRepository(\App\Entity\ArticuloFotografia::class)->findAll(),
+            $request->query->getInt('pagina', 1),
+            3
+        );
+        if($request->isXmlHttpRequest()){
+            return new Response(json_encode([
+                'type' => 'load',
+                'content' => $this->renderView('backend/ArticuloFotografia/cargarFotografias.html.twig', [
+                    'articulo' => $articulo,
+                    'fotografias' => $fotografias,
+                    'submenu' => 'fotografias',
+                ])
+            ]));
+        }
         return $this->render('backend/ArticuloFotografia/editarFotografias.html.twig', [
             'articulo' => $articulo,
+            'fotografias' => $fotografias,
             'submenu' => 'fotografias',
         ]);
     }
@@ -102,7 +119,7 @@ class ArticuloFotografiaController extends AbstractController
         $entityManager->remove($foto);
         $entityManager->flush();
         $this->addFlash('Eliminado', 'Fotografia eliminada correctamente');
-        return $this->redirectToRoute('backend_articulo_editar', [
+        return $this->redirectToRoute('backend_articulo_fotografia_editar', [
             'id' => $foto->getArticulo()->getId()
         ]);
     }
@@ -121,7 +138,7 @@ class ArticuloFotografiaController extends AbstractController
         $articulo->setFotografiaPrincipal($foto);
         $entityManager->flush();
         $this->addFlash('Editado', 'Fotografia principal establecida correctamente');
-        return $this->redirectToRoute('backend_articulo_editar', [
+        return $this->redirectToRoute('backend_articulo_fotografia_editar', [
             'id' => $foto->getArticulo()->getId()
         ]);
     }
@@ -224,22 +241,216 @@ class ArticuloFotografiaController extends AbstractController
             //echo "Imagen en: " . $this->getMiniThumbnailNombreArchivo();
             //echo "Proceso finalizado." . '</br>';
             //exit();
-        } catch (Exception $ex) {
+        } catch (\Exception $ex) {
             echo $ex . '</br>';
         }
        
 
     }
 
+    /**
+     * funcion para subir imagenes al servidor
+     */
+    public function subirFotografias2($temp, $nombreArchivo)
+    {
+        #crear carpetas si no existen
+        if (!is_dir($this->getUploadRootDirNombreArchivo())) {
+            mkdir($this->getUploadRootDirNombreArchivo(), 0777, true);
+        }
+        #crear carpetas si no existen
+        if (!is_dir($this->getWaterImageXL())) {
+            mkdir($this->getWaterImageXL(), 0777, true);
+        }
+        #crear carpetas si no existen
+        if (!is_dir($this->getImageXL())) {
+            mkdir($this->getImageXL(), 0777, true);
+        }
+        #crear carpetas si no existen
+        if (!is_dir($this->getImageL())) {
+            mkdir($this->getImageL(), 0777, true);
+        }
+        #crear carpetas si no existen
+        if (!is_dir($this->getImageM())) {
+            mkdir($this->getImageM(), 0777, true);
+        }
+        #crear carpetas si no existen
+        if (!is_dir($this->getImageS())) {
+            mkdir($this->getImageS(), 0777, true);
+        }
+
+        if(move_uploaded_file($temp, $this->getUploadRootDirNombreArchivo().'/'.$nombreArchivo)){
+            
+        }else{
+            echo 'Ocurrió algún error al subir la imagen';
+        }
+        ## xl
+        $img_xl_max_height = 2048;
+        $img_xl_max_width = 2048;
+
+        // mediana
+        $img_l_max_height = 512;
+        $img_l_max_width = 512;
+
+        // thumbnail
+        $img_m_max_height = 256;
+        $img_m_max_width = 256;
+
+        // mini-thumbnail
+        $img_s_max_height = 64;
+        $img_s_max_width = 64;
+        // make banner
+        try {
+            //new \Imagick;
+            //move_uploaded_file($newFile, $this->getAbsoluteNombreArchivo());
+            $img_xl = new \Imagick($this->getUploadRootDirNombreArchivo().'/'.$nombreArchivo);
+            //$img->resampleImage(72, 72, 1, 1);
+            //$img->scaleImage($img_xl_max_width, 0);
+            $img_xl->setImageFormat('jpg');
+            $img_xl->setImageCompression(\Imagick::COMPRESSION_JPEG);
+            $img_xl->setImageCompressionQuality(70);
+            $img_xl->stripimage();
+            $img_xl = $img_xl->flattenimages();
+            $img_xl->setimagebackgroundcolor('white');
+
+            // corregir orientacion
+            $orientation = $img_xl->getImageOrientation();
+            switch ($orientation) {
+                case \Imagick::ORIENTATION_BOTTOMRIGHT:
+                    $img_xl->rotateimage("#000", 180); // rotate 180 degrees
+                    break;
+
+                case \Imagick::ORIENTATION_RIGHTTOP:
+                    $img_xl->rotateimage("#000", 90); // rotate 90 degrees CW
+                    break;
+
+                case \Imagick::ORIENTATION_LEFTBOTTOM:
+                    $img_xl->rotateimage("#000", -90); // rotate 90 degrees CCW
+                    break;
+            }
+
+            // Now that it's auto-rotated, make sure the EXIF data is correct in case the EXIF gets saved with the image!
+            $img_xl->setImageOrientation(\Imagick::ORIENTATION_TOPLEFT);
+
+            $dimensiones_img_xl = $img_xl->getImageGeometry();
+
+            $img_l = clone $img_xl;
+//            $thumbnail->thumbnailImage($img_small_max_width, null);
+
+            $img_m = clone $img_xl;
+            $img_m->thumbnailImage($img_l_max_width, null);
+
+            $img_s = clone $img_xl;
+//            $mini_thumbnail->thumbnailImage($img_xs_max_width, null);
+
+            $original_height = $dimensiones_img_xl['height'];
+            $original_width = $dimensiones_img_xl['width'];
+            if ($original_height > $img_xl_max_height) {
+                $img_xl->scaleImage(null, $img_xl_max_height);
+                $img_xl->writeImage($this->getImageXL().'/'.$nombreArchivo);
+                $img_xl->writeImage($this->getWaterImageXL().'/'.$nombreArchivo);                
+                $this->colocaMarcaAgua($this->getWaterImageXL().'/'.$nombreArchivo);
+                
+                $img_l->thumbnailImage(null, $img_l_max_height);
+                $img_l->writeImage($this->getImageL().'/'.$nombreArchivo);
+                $this->colocaMarcaAgua($this->getImageL().'/'.$nombreArchivo);
+                
+                $img_m->thumbnailImage(null, $img_m_max_height);
+                $img_m->writeImage($this->getImageM().'/'.$nombreArchivo);
+                
+                $img_s->thumbnailImage(null, $img_s_max_height);
+                $img_s->writeImage($this->getImageS().'/'.$nombreArchivo);
+            } else if ($original_width > $img_xl_max_width) {
+                $img_xl->scaleImage($img_xl_max_width, null);
+                $img_xl->writeImage($this->getImageXL().'/'.$nombreArchivo);
+                $img_xl->writeImage($this->getWaterImageXL().'/'.$nombreArchivo);
+                $this->colocaMarcaAgua($this->getWaterImageXL().'/'.$nombreArchivo);
+                
+                $img_l->thumbnailImage($img_l_max_width, null);
+                $img_l->writeImage($this->getImageL().'/'.$nombreArchivo);
+                $this->colocaMarcaAgua($this->getImageL().'/'.$nombreArchivo);
+                
+                $img_m->thumbnailImage($img_m_max_width, null);
+                $img_m->writeImage($this->getImageM().'/'.$nombreArchivo);
+                
+                $img_s->thumbnailImage($img_s_max_width, null);
+                $img_s->writeImage($this->getImageS().'/'.$nombreArchivo);
+            } else {
+                $img_xl->writeImage($this->getImageXL().'/'.$nombreArchivo);
+                $img_xl->writeImage($this->getWaterImageXL().'/'.$nombreArchivo);
+                $this->colocaMarcaAgua($this->getWaterImageXL().'/'.$nombreArchivo);
+                
+                $img_l->writeImage($this->getImageL().'/'.$nombreArchivo);
+                $this->colocaMarcaAgua($this->getImageL().'/'.$nombreArchivo);
+                
+                $img_m->writeImage($this->getImageM().'/'.$nombreArchivo);
+                $img_s->writeImage($this->getImageS().'/'.$nombreArchivo);
+            }
+            $img_xl->destroy();
+            $img_l->destroy();
+            $img_m->destroy();
+            $img_s->destroy();
+        } catch (\Exception $ex) {
+            throw $ex . '</br>';
+        }
+    }
+
     protected function getUploadRootDirNombreArchivo() {
         // the absolute directory picture where uploaded
         // documents should be saved
-        return '/var/www/tiendaonline/market/project/public' . $this->getUploadDirNombreArchivo();
+        if($_SERVER['SERVER_NAME'] == '127.0.0.1:8000' || $_SERVER['SERVER_NAME'] == '127.0.0.1'){
+            $dir = '/var/www/tiendaonline/market/project/private';
+        }elseif($_SERVER['SERVER_NAME'] == 'dev.uniestilos.shop'){
+            $dir = '/home/u141948896/public_html/dev/uniestilos/private';
+        }elseif($_SERVER['SERVER_NAME'] == 'uniestilos.shop'){
+            $dir = '/home/u141948896/public_html/uniestilos/private';
+        }
+        return $dir . $this->getUploadDirNombreArchivo();
     }
 
     protected function getUploadDirNombreArchivo() {
         // get rid of the __DIR__ so it doesn't screw up
         // when displaying uploaded doc/image in the view.
-        return '/assets/img/back/articulos';
+        return '/articulos';
     }
+
+    ############################################################################
+    # INICIAN RUTAS ABSOLUTE
+
+    private function getWaterImageXL() {
+        return $this->getUploadRootDirNombreArchivo() . '/xl_wm';
+    }
+    
+    private function getImageXL() {
+        return $this->getUploadRootDirNombreArchivo() . '/xl';
+    }
+
+    private function getImageL() {
+        return $this->getUploadRootDirNombreArchivo() . '/l';
+    }       
+
+    private function getImageM() {
+        return $this->getUploadRootDirNombreArchivo() . '/m';
+    }
+    
+    private function getImageS() {
+        return $this->getUploadRootDirNombreArchivo() . '/s';
+    }
+
+
+    /**
+     * funcion para crear marca de agua en las imagenes
+     * 
+     */
+    public function colocaMarcaAgua($ruta_imagen) {
+        $watermark = new \Imagick();     
+        $watermark->setBackgroundColor(new \ImagickPixel('transparent'));
+        $watermark->readImage($this->getUploadRootDirNombreArchivo() . '/copyright.png');
+        $watermark->setImageFormat('png32');
+        $watermark->evaluateImage(\Imagick::EVALUATE_MULTIPLY, 0.15, \Imagick::CHANNEL_ALPHA);
+        
+        $img = new \Imagick($ruta_imagen);
+        $img->compositeImage($watermark, \imagick::COMPOSITE_OVER, 0, 0);
+        $img->writeImage($ruta_imagen);        
+    }
+    
 }

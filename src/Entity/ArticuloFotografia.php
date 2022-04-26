@@ -124,69 +124,90 @@ class ArticuloFotografia
     }
 
     ######################Funciones Fotografias #################################
+
     /**
-     * Regresa una imagen por defecto cuando no encuentra la original
+     * funciona para obtener base64_encode para las imagenes de fotografia
+     */
+    public function getPathArchivo($carpeta, $archivo_fotografia) {
+        $path = $this->getUploadRootDirNombreArchivo() . $carpeta . $archivo_fotografia;
+        if (file_exists($path)) {
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            return $base64;
+        } else {
+            return $this->getNoLogoImage();
+        }
+    }
+
+    #######################################################################################
+    ############# FUNCIONES PARA MOSTRAR A USUARIO ########################################
+    public function getFotografiaMW() {
+        return null === $this->nombreArchivo ? null : $this->getPathArchivo('/xl_wm/' ,$this->nombreArchivo);
+    }
+    public function getFotografiaXL() {
+        return null === $this->nombreArchivo ? null : $this->getPathArchivo('/xl/' ,$this->nombreArchivo);
+    }
+    public function getFotografiaL() {
+        return null === $this->nombreArchivo ? null : $this->getPathArchivo('/l/' ,$this->nombreArchivo);
+    }
+    public function getFotografiaM() {
+        return null === $this->nombreArchivo ? null : $this->getPathArchivo('/m/' ,$this->nombreArchivo);
+    }
+    public function getFotografiaS() {
+        return null === $this->nombreArchivo ? null : $this->getPathArchivo('/m/' ,$this->nombreArchivo);
+    }
+
+    #######################################################################################
+    ################## RUTAS DE IMAGENES ##################################################
+    public function rutaFotografiaMW() {
+        return  $this->getUploadRootDirNombreArchivo().'/xl_wm/'.$this->nombreArchivo;
+    }
+    public function rutaFotografiaXL() {
+        return  $this->getUploadRootDirNombreArchivo().'/xl/'.$this->nombreArchivo;
+    }
+    public function rutaFotografiaL() {
+        return  $this->getUploadRootDirNombreArchivo().'/l/'.$this->nombreArchivo;
+    }
+    public function rutaFotografiaM() {
+        return  $this->getUploadRootDirNombreArchivo().'/m/'.$this->nombreArchivo;
+    }
+    public function rutaFotografiaS() {
+        return  $this->getUploadRootDirNombreArchivo().'/s/'.$this->nombreArchivo;
+    }
+    public function rutaFotografiaOriginal() {
+        return  $this->getUploadRootDirNombreArchivo().'/'.$this->nombreArchivo;
+    }
+
+    /**
+     * Regresa una imagen por defecto cuando no encuentra la original en base 64
      */
     public function getNoLogoImage() {
-        //return 'http://' . $_SERVER['SERVER_NAME'] . '/images/noimage.png';
-        return  $this->getUploadRootDirNombreArchivo(). '/assets/img/noImage.png';
+        $archivo = $this->getUploadRootDirNombreArchivo() . '/noImage.png';
+        $type = pathinfo($archivo, PATHINFO_EXTENSION);
+        $data = file_get_contents($archivo);
+        $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+        return $base64;
     }
 
-    public function getMiniThumbnailNombreArchivo() {
-        return null === $this->nombreArchivo ? null : $this->getUploadRootDirNombreArchivo() . '/mini_thumbs/' . $this->nombreArchivo;
-    }
-
-    public function getWebMiniThumbnailNombreArchivo() {
-        if (file_exists($this->getMiniThumbnailNombreArchivo())) {
-            //return null === $this->nombreArchivo ? null : 'http://' . $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . '/' . $this->getUploadDirNombreArchivo() . '/mini_thumbs/' . $this->nombreArchivo;
-            return null === $this->nombreArchivo ? null :  $this->getUploadDirNombreArchivo() . '/mini_thumbs/' . $this->nombreArchivo;
-        } else {
-            return $this->getNoLogoImage();
-        }
-    }
-
-    public function getThumbnailNombreArchivo() {
-        return null === $this->nombreArchivo ? null : $this->getUploadRootDirNombreArchivo() . '/thumbs/' . $this->nombreArchivo;
-    }
-
-    public function getWebThumbnailNombreArchivo() {
-        if (file_exists($this->getThumbnailNombreArchivo())) {
-            //return null === $this->nombreArchivo ? null : 'http://' . $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . '/' . $this->getUploadDirNombreArchivo() . '/thumbs/' . $this->nombreArchivo;
-            return null === $this->nombreArchivo ? null : $this->getUploadDirNombreArchivo() . '/thumbs/' . $this->nombreArchivo;
-        } else {
-            return $this->getNoLogoImage();
-        }
-    }
-
-    public function getAbsoluteNombreArchivo() {
-        return null === $this->nombreArchivo ? null : $this->getUploadRootDirNombreArchivo() . '/' . $this->nombreArchivo;
-    }
-    public function getAbsoluteNombreArchivoThumb() {
-        return null === $this->nombreArchivo ? null : $this->getUploadRootDirNombreArchivo() . '/thumbs/' . $this->nombreArchivo;
-    }
-    public function getAbsoluteNombreArchivoMiniThumb() {
-        return null === $this->nombreArchivo ? null : $this->getUploadRootDirNombreArchivo() . '/mini_thumbs/' . $this->nombreArchivo;
-    }
-
-    public function getWebNombreArchivo() {
-        if (file_exists($this->getAbsoluteNombreArchivo())) {
-            //return null === $this->nombreArchivo ? null : 'http://' . $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT'] . '/' . $this->getUploadDirNombreArchivo() . '/' . $this->nombreArchivo;
-            return null === $this->nombreArchivo ? null : $this->getUploadDirNombreArchivo() . '/' . $this->nombreArchivo;
-        } else {
-            return $this->getNoLogoImage();
-        }
-    }
 
     protected function getUploadRootDirNombreArchivo() {
         // the absolute directory picture where uploaded
         // documents should be saved
-        return '/var/www/tiendaonline/market/project/public' . $this->getUploadDirNombreArchivo();
+        if($_SERVER['SERVER_NAME'] == '127.0.0.1:8000' || $_SERVER['SERVER_NAME'] == '127.0.0.1'){
+            $dir = '/var/www/tiendaonline/market/project/private';
+        }elseif($_SERVER['SERVER_NAME'] == 'dev.uniestilos.shop'){
+            $dir = '/home/u141948896/public_html/dev/uniestilos/private';
+        }elseif($_SERVER['SERVER_NAME'] == 'uniestilos.shop'){
+            $dir = '/home/u141948896/public_html/uniestilos/private';
+        }
+        return $dir . $this->getUploadDirNombreArchivo();
     }
 
     protected function getUploadDirNombreArchivo() {
         // get rid of the __DIR__ so it doesn't screw up
         // when displaying uploaded doc/image in the view.
-        return '/assets/img/back/articulos';
+        return '/articulos';
     }
 
     /**
@@ -197,19 +218,34 @@ class ArticuloFotografia
     */
     public function eliminarFotografiaArticulo(){
         /* imagen original */
-        $nombreArchivoOriginal = $this->getAbsoluteNombreArchivo();
+        $nombreArchivoOriginal = $this->rutaFotografiaOriginal();
         if(file_exists($nombreArchivoOriginal)){
             unlink($nombreArchivoOriginal);
         }
-         /* imagen thumb */
-        $nombreArchivoThumb = $this->getAbsoluteNombreArchivoThumb();
-        if(file_exists($nombreArchivoThumb)){
-            unlink($nombreArchivoThumb);
+         /* marca de agua */
+        $nombreArchivoMW = $this->rutaFotografiaMW();
+        if(file_exists($nombreArchivoMW)){
+            unlink($nombreArchivoMW);
         }
-         /* imagen mini_thumb */
-         $nombreArchivoMiniThumb = $this->getAbsoluteNombreArchivoMiniThumb();
-        if(file_exists($nombreArchivoMiniThumb)){
-            unlink($nombreArchivoMiniThumb);
+         /* imagen XL */
+         $nombreArchivoXL = $this->rutaFotografiaXL();
+        if(file_exists($nombreArchivoXL)){
+            unlink($nombreArchivoXL);
+        }
+        /* imagen L */
+        $nombreArchivoL = $this->rutaFotografiaL();
+        if(file_exists($nombreArchivoL)){
+            unlink($nombreArchivoL);
+        }
+        /* imagen M */
+        $nombreArchivoM = $this->rutaFotografiaM();
+        if(file_exists($nombreArchivoM)){
+            unlink($nombreArchivoM);
+        }
+        /* imagen S */
+        $nombreArchivoS = $this->rutaFotografiaS();
+        if(file_exists($nombreArchivoS)){
+            unlink($nombreArchivoS);
         }
     }
 }

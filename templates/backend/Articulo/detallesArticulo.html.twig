@@ -48,6 +48,10 @@
                             <td>{{ articulo.urlAmigable }}</td>
                         </tr>
                         <tr>
+                            <th>Link de eshop</th>
+                            <td><a target="blank" href="{{ url('frontend_articulo_detalles', {'id': articulo.id, 'urlAmigable': articulo.urlAmigable }) }}">ir a pagina</a></td>
+                        </tr>
+                        <tr>
                             <td colspan="2">
                                 <small><b>Fecha hora creación:</b> {{ articulo.fechahoraCreacion ? articulo.fechahoraCreacion|date('Y-m-d H:i:s') : '' }} <b>por:</b> {{ articulo.usuarioCreador ? articulo.usuarioCreador.nombreCompleto : '-' }}</small>
                                 <small><b>Fecha hora Edición:</b> {{ articulo.fechahoraEdicion ? articulo.fechahoraEdicion|date('Y-m-d H:i:s') : '' }} <b>por:</b> {{ articulo.usuarioEditor ? articulo.usuarioEditor.nombreCompleto : '-' }}</small>
@@ -70,7 +74,7 @@
                 <div class="row">
                 {% for fotografia in articulo.fotografias %}
                     <div class="col-lg-3 col-md-3 col-sm-6">
-                        <img src="{{ fotografia.getWebThumbnailNombreArchivo }}" alt="..." class="img-thumbnail" style="width:200px;height:200px">
+                        <img src="{{ fotografia.getFotografiaS }}" alt="..." class="img-thumbnail" style="width:200px;height:200px">
                     </div>
                 {% else %}
                     <div class="col-lg-3">

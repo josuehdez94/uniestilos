@@ -8,11 +8,15 @@ use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use SymfonyCasts\Bundle\ResetPassword\Controller\ResetPasswordControllerTrait;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mime\Email;
 
 /**
  * @Route("/backend/admin/usuario")
@@ -41,7 +45,7 @@ class UserController extends AbstractController
     /**
      * @Route("/nuevo", name="backend_user_nuevo", methods={"GET","POST"})
      */
-    public function nuevoUsuario(Request $request, UserPasswordEncoderInterface $passwordEncoder): Response
+    public function nuevoUsuario(Request $request, UserPasswordEncoderInterface $passwordEncoder, MailerInterface $mailer): Response
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -49,8 +53,19 @@ class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager = $this->getDoctrine()->getManager();
-            $encoded = $passwordEncoder->encodePassword($user, 'nicejoyeria');
+            
+            #encriptar datos
+            $encryt = new \App\Generales\Funciones();
+            $cadena = md5(random_int(-20000, 50000).date('Y-m-d g:i:s'));
+            $key = md5(random_int(-50000, 20000).date('Y-m-d g:i:s'));
+            $clave = md5(date('Y-m-d g:i:s').random_int(-1000, 1000), false);
+            $encoded = $passwordEncoder->encodePassword($user, 'uniestilos');
             $user->setPassword($encoded);
+            $user->setTipoUser('E');
+            $user->setClaveVerificacion($clave);
+            $user->setCrypt($encryt->encriptar($cadena, $key).','.$key);
+            $user->setDecrypt($cadena);
+            $user->setUid($cadena);
             $entityManager->persist($user);
             $entityManager->flush();
             //$this->addFlash('Creado', 'Usuario creado exitosamente');
@@ -111,7 +126,7 @@ class UserController extends AbstractController
         return $this->redirectToRoute('user_index');
     }
     
-    private function processSendingPasswordResetEmail(string $emailFormData, \Swift_Mailer $mailer): RedirectResponse
+    private function processSendingPasswordResetEmail(string $emailFormData, MailerInterface $mailer): RedirectResponse
     {
         $user = $this->getDoctrine()->getRepository(User::class)->findOneBy([
             'email' => $emailFormData,
@@ -155,19 +170,19 @@ class UserController extends AbstractController
         //$resetToken = hash('sha512', date('Y-m-d g:i:s'));
         //$resetToken = $this->resetPasswordHelper->generateResetToken($user);
         
-        $message = (new \Swift_Message('Restablecer contraseña'))
-        ->setFrom('resetpassword@nicenmt.com')
-        ->setTo('pruebastodopartes@gmail.com')
-        ->setBody(
-            $this->renderView(
-                //templates/emails/registration.html.twig
-                'backend/ResetPassword/email.html.twig',
-                ['resetToken' => $resetToken,
-                   'tokenLifetime' => $this->resetPasswordHelper->getTokenLifetime(),
+        $message = (new Email())
+                ->from('contacto@uniestilos.shop')
+                ->to($user->getEmail())
+                ->subject('Su cuenta se ha creado, establece tu contraseña')
+                ->html($this->renderView(
+                    'backend/ResetPassword/email.html.twig', [
+                        'resetToken' => $resetToken,
+                        'tokenLifetime' => $this->resetPasswordHelper->getTokenLifetime(),
                     ]
-            ),
-            'text/html'
-        );
+                    ),
+                'text/html'
+                )
+        ;
 
         $mailer->send($message);
 
